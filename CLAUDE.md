@@ -215,6 +215,10 @@ const tokens = sdk.oauth.getTokens();       // full token object (access_token, 
 import { useConnectorData, useWidgetConfig, useWidgetState, useHubbleSDK } from '@hubble/sdk';
 
 // Subscribe to connector data — auto re-renders
+// IMPORTANT: with no args, subscribes to '{module-name}:data' topic.
+// Your connector MUST emit to that exact topic: sdk.emit('hubble-timer:data', ...)
+// If you emit to a different topic (e.g. ':state'), pass args explicitly:
+//   useConnectorData<MyData>('hubble-timer', 'hubble-timer:state')
 const data = useConnectorData<MyData>();
 
 // Read widget config (from manifest properties)
@@ -267,6 +271,8 @@ Panel components receive `{ config, onConfigChange, moduleId, moduleName }` prop
 - **Connector**: Server-only. Fetches external data and emits events via `sdk.emit()`.
 - **Visualization**: Client-only. Renders React component inside widget container. Subscribes via `useConnectorData()`.
 - **Hybrid**: Has both a `connector/` and `visualizations/`.
+
+> **IMPORTANT — Hybrid modules:** Visualization files **cannot import from `connector/`**. The client bundler only bundles files within the visualization's own directory tree. `connector/` is server-side only. Any types or utilities needed by both sides must be **inlined** (copy-pasted) into the visualization file.
 
 ### Widget Lifecycle
 
