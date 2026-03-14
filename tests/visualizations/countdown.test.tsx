@@ -104,6 +104,81 @@ describe('size prop', () => {
   });
 });
 
+describe('hardware buttons', () => {
+  beforeEach(() => {
+    global.fetch = vi.fn().mockResolvedValue({ ok: true });
+  });
+
+  it('button1 calls /pause when timer is running', async () => {
+    setTimer({ status: 'running', duration: 600_000, startedAt: Date.now(), elapsed: 0 });
+    const mockSdk = {
+      onButton: vi.fn((name: string, handler: () => void) => {
+        if (name === 'button1') { (mockSdk as any)._button1 = handler; }
+        return vi.fn();
+      }),
+      requestAcknowledge: vi.fn(),
+    };
+    (useHubbleSDK as ReturnType<typeof vi.fn>).mockReturnValue(mockSdk);
+    render(<CountdownViz />);
+    await (mockSdk as any)._button1();
+    expect(global.fetch).toHaveBeenCalledWith(
+      '/api/modules/hubble-timer/pause',
+      expect.objectContaining({ method: 'POST', body: JSON.stringify({ slug: 'timer-1' }) })
+    );
+  });
+
+  it('button1 calls /resume when timer is paused', async () => {
+    setTimer({ status: 'paused', duration: 600_000, elapsed: 10_000 });
+    const mockSdk = {
+      onButton: vi.fn((name: string, handler: () => void) => {
+        if (name === 'button1') { (mockSdk as any)._button1 = handler; }
+        return vi.fn();
+      }),
+      requestAcknowledge: vi.fn(),
+    };
+    (useHubbleSDK as ReturnType<typeof vi.fn>).mockReturnValue(mockSdk);
+    render(<CountdownViz />);
+    await (mockSdk as any)._button1();
+    expect(global.fetch).toHaveBeenCalledWith(
+      '/api/modules/hubble-timer/resume',
+      expect.objectContaining({ method: 'POST', body: JSON.stringify({ slug: 'timer-1' }) })
+    );
+  });
+});
+
+describe('warning threshold', () => {
+  it('applies countdown__arc--red class when time remaining is below warningThreshold', () => {
+    // warningThreshold is 300s = 300_000ms; set remaining < 300s
+    const now = Date.now();
+    setConfig({ warningThreshold: 300 }); // default
+    // elapsed + (now - startedAt) = 590s out of 600s → remaining = 10s < 300s threshold
+    setTimer({
+      status: 'running',
+      duration: 600_000,
+      startedAt: now - 590_000,
+      elapsed: 0,
+    });
+    const { container } = render(<CountdownViz />);
+    const redArc = container.querySelector('.countdown__arc--red');
+    expect(redArc).not.toBeNull();
+  });
+
+  it('does not apply countdown__arc--red when above threshold', () => {
+    const now = Date.now();
+    setConfig({ warningThreshold: 300 });
+    // only 10s elapsed → remaining = 590s > 300s
+    setTimer({
+      status: 'running',
+      duration: 600_000,
+      startedAt: now - 10_000,
+      elapsed: 0,
+    });
+    const { container } = render(<CountdownViz />);
+    const redArc = container.querySelector('.countdown__arc--red');
+    expect(redArc).toBeNull();
+  });
+});
+
 describe('slug filtering', () => {
   it('shows idle when state map has no entry for this slug', () => {
     mockData.mockReturnValue({ 'other': { slug: 'other', status: 'running' } });

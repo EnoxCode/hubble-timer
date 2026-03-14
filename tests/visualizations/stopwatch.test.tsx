@@ -1,7 +1,7 @@
 import React from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import { useConnectorData, useWidgetConfig } from '@hubble/sdk';
+import { useConnectorData, useWidgetConfig, useHubbleSDK } from '@hubble/sdk';
 import StopwatchViz from '../../visualizations/stopwatch/index';
 
 vi.mock('@hubble/sdk', () => ({
@@ -107,5 +107,14 @@ describe('done state', () => {
     setTimer({ status: 'done', elapsed: 60_000 });
     render(<StopwatchViz />);
     expect(screen.getByText('ELAPSED')).toBeInTheDocument();
+  });
+
+  it('calls requestAcknowledge when doneExpand is true', () => {
+    const mockSdk = { onButton: vi.fn(() => vi.fn()), requestAcknowledge: vi.fn() };
+    (useHubbleSDK as ReturnType<typeof vi.fn>).mockReturnValue(mockSdk);
+    setConfig({ doneExpand: true });
+    setTimer({ status: 'done', elapsed: 60_000 });
+    render(<StopwatchViz />);
+    expect(mockSdk.requestAcknowledge).toHaveBeenCalled();
   });
 });
