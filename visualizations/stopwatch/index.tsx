@@ -1,7 +1,27 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useConnectorData, useWidgetConfig, useHubbleSDK } from '@hubble/sdk';
-import { TimerState, computeDisplayMs } from '../../connector/timerState';
 import './style.css';
+
+interface TimerState {
+  slug: string;
+  label: string | null;
+  status: 'idle' | 'running' | 'paused' | 'done';
+  mode: 'countdown' | 'stopwatch';
+  duration: number | null;
+  startedAt: number | null;
+  elapsed: number;
+}
+
+function computeDisplayMs(timer: TimerState, now: number): number {
+  const totalElapsed =
+    timer.status === 'running'
+      ? timer.elapsed + (now - (timer.startedAt ?? now))
+      : timer.elapsed;
+  if (timer.mode === 'countdown' && timer.duration != null) {
+    return Math.max(0, timer.duration - totalElapsed);
+  }
+  return totalElapsed;
+}
 
 interface StopwatchConfig {
   slug: string;
