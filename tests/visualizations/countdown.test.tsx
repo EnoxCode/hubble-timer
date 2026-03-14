@@ -122,7 +122,7 @@ describe('hardware buttons', () => {
     render(<CountdownViz />);
     await (mockSdk as any)._button1();
     expect(global.fetch).toHaveBeenCalledWith(
-      '/api/modules/hubble-timer/pause',
+      '/api/module/hubble-timer/api/pause',
       expect.objectContaining({ method: 'POST', body: JSON.stringify({ slug: 'timer-1' }) })
     );
   });
@@ -140,7 +140,7 @@ describe('hardware buttons', () => {
     render(<CountdownViz />);
     await (mockSdk as any)._button1();
     expect(global.fetch).toHaveBeenCalledWith(
-      '/api/modules/hubble-timer/resume',
+      '/api/module/hubble-timer/api/resume',
       expect.objectContaining({ method: 'POST', body: JSON.stringify({ slug: 'timer-1' }) })
     );
   });

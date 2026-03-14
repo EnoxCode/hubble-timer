@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useConnectorData, useWidgetConfig, useHubbleSDK } from '@hubble/sdk';
 import { TimerState, computeDisplayMs } from '../../connector/timerState';
 import './style.css';
@@ -34,18 +34,26 @@ export default function CountdownViz() {
   const timer: TimerState | null = allStates?.[config.slug] ?? null;
   timerRef.current = timer;
 
+  // Tick every second while running so the display updates client-side
+  const [, setTick] = useState(0);
+  useEffect(() => {
+    if (timer?.status !== 'running') return;
+    const id = setInterval(() => setTick((n) => n + 1), 1000);
+    return () => clearInterval(id);
+  }, [timer?.status]);
+
   // Hardware buttons
   useEffect(() => {
     const unsubToggle = sdk.onButton('button1', async () => {
       const action = timerRef.current?.status === 'running' ? 'pause' : 'resume';
-      await fetch(`/api/modules/hubble-timer/${action}`, {
+      await fetch(`/api/module/hubble-timer/api/${action}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ slug: config.slug }),
       });
     });
     const unsubReset = sdk.onButton('button2', async () => {
-      await fetch('/api/modules/hubble-timer/reset', {
+      await fetch('/api/module/hubble-timer/api/reset', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ slug: config.slug }),
