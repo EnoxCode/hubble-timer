@@ -10,6 +10,208 @@ import {
   computeDisplayMs,
 } from '../connector/timerState';
 
+// ─── Connector integration helpers ───────────────────────────────────────────
+
+type MockSdk = ReturnType<typeof makeMockSdk>;
+
+// storedStates is a JSON string (as sdk.storage.get returns) or null
+function makeMockSdk(storedStates?: string | null) {
+  return {
+    emit: vi.fn(),
+    onApiCall: vi.fn(),
+    log: { info: vi.fn(), warn: vi.fn(), error: vi.fn() },
+    notify: vi.fn(),
+    getWidgetConfigs: vi.fn(() => [] as Record<string, unknown>[]),
+    storage: {
+      get: vi.fn((key: string) => (key === 'timerStates' ? (storedStates ?? null) : null)),
+      set: vi.fn(),
+      delete: vi.fn(),
+      collection: vi.fn(),
+    },
+  };
+}
+
+async function callAction(sdk: MockSdk, action: string, body: Record<string, unknown>) {
+  const handler = sdk.onApiCall.mock.calls[0][0];
+  return handler({ action, params: {}, body });
+}
+
+describe('connector: API actions', () => {
+  beforeEach(() => { vi.useFakeTimers(); });
+  afterEach(() => { vi.useRealTimers(); });
+
+  it('start creates a running countdown and emits state', async () => {
+    const sdk = makeMockSdk();
+    connector(sdk as any);
+    const result = await callAction(sdk, 'start', { slug: 'timer-1', duration: 60, label: 'Pizza' });
+    expect(result).toEqual({ ok: true });
+    expect(sdk.emit).toHaveBeenCalledWith('hubble-timer:state', expect.objectContaining({
+      'timer-1': expect.objectContaining({ status: 'running', mode: 'countdown', label: 'Pizza' }),
+    }));
+    expect(sdk.storage.set).toHaveBeenCalledWith('timerStates', expect.any(String));
+  });
+
+  it('start with no duration creates a stopwatch', async () => {
+    const sdk = makeMockSdk();
+    connector(sdk as any);
+    await callAction(sdk, 'start', { slug: 'sw-1' });
+    expect(sdk.emit).toHaveBeenCalledWith('hubble-timer:state', expect.objectContaining({
+      'sw-1': expect.objectContaining({ status: 'running', mode: 'stopwatch' }),
+    }));
+  });
+
+  it('pause accumulates elapsed time', async () => {
+    const sdk = makeMockSdk();
+    connector(sdk as any);
+    await callAction(sdk, 'start', { slug: 'timer-1', duration: 60 });
+    vi.advanceTimersByTime(10_000);
+    const result = await callAction(sdk, 'pause', { slug: 'timer-1' });
+    expect(result).toEqual({ ok: true });
+    expect(sdk.emit).toHaveBeenLastCalledWith('hubble-timer:state', expect.objectContaining({
+      'timer-1': expect.objectContaining({ status: 'paused', elapsed: 10_000 }),
+    }));
+  });
+
+  it('pause returns error if timer is not running', async () => {
+    const sdk = makeMockSdk();
+    connector(sdk as any);
+    const result = await callAction(sdk, 'pause', { slug: 'timer-1' });
+    expect(result).toEqual({ error: 'Timer not running' });
+  });
+
+  it('resume re-arms the countdown and emits running state', async () => {
+    const sdk = makeMockSdk();
+    connector(sdk as any);
+    await callAction(sdk, 'start', { slug: 'timer-1', duration: 60 });
+    await callAction(sdk, 'pause', { slug: 'timer-1' });
+    const result = await callAction(sdk, 'resume', { slug: 'timer-1' });
+    expect(result).toEqual({ ok: true });
+    expect(sdk.emit).toHaveBeenLastCalledWith('hubble-timer:state', expect.objectContaining({
+      'timer-1': expect.objectContaining({ status: 'running' }),
+    }));
+  });
+
+  it('resume returns error if timer is not paused', async () => {
+    const sdk = makeMockSdk();
+    connector(sdk as any);
+    const result = await callAction(sdk, 'resume', { slug: 'timer-1' });
+    expect(result).toEqual({ error: 'Timer not paused' });
+  });
+
+  it('reset returns timer to idle and clears label', async () => {
+    const sdk = makeMockSdk();
+    connector(sdk as any);
+    await callAction(sdk, 'start', { slug: 'timer-1', duration: 60, label: 'Pizza' });
+    const result = await callAction(sdk, 'reset', { slug: 'timer-1' });
+    expect(result).toEqual({ ok: true });
+    expect(sdk.emit).toHaveBeenLastCalledWith('hubble-timer:state', expect.objectContaining({
+      'timer-1': expect.objectContaining({ status: 'idle', label: null }),
+    }));
+  });
+
+  it('fires done event when countdown expires', async () => {
+    const sdk = makeMockSdk();
+    sdk.getWidgetConfigs.mockReturnValue([{ slug: 'timer-1', title: 'Pizza Timer', doneNotify: true }]);
+    connector(sdk as any);
+    await callAction(sdk, 'start', { slug: 'timer-1', duration: 10 });
+    vi.advanceTimersByTime(10_000);
+    expect(sdk.emit).toHaveBeenLastCalledWith('hubble-timer:state', expect.objectContaining({
+      'timer-1': expect.objectContaining({ status: 'done' }),
+    }));
+    expect(sdk.notify).toHaveBeenCalledWith('Pizza Timer is done!', { level: 'info' });
+  });
+
+  it('uses API label for done notification when label is set', async () => {
+    const sdk = makeMockSdk();
+    sdk.getWidgetConfigs.mockReturnValue([{ slug: 'timer-1', title: 'Pizza Timer', doneNotify: true }]);
+    connector(sdk as any);
+    await callAction(sdk, 'start', { slug: 'timer-1', duration: 10, label: 'Lasagna' });
+    vi.advanceTimersByTime(10_000);
+    expect(sdk.notify).toHaveBeenCalledWith('Lasagna is done!', { level: 'info' });
+  });
+
+  it('does not notify when doneNotify is false', async () => {
+    const sdk = makeMockSdk();
+    sdk.getWidgetConfigs.mockReturnValue([{ slug: 'timer-1', title: 'Pizza Timer', doneNotify: false }]);
+    connector(sdk as any);
+    await callAction(sdk, 'start', { slug: 'timer-1', duration: 10 });
+    vi.advanceTimersByTime(10_000);
+    expect(sdk.notify).not.toHaveBeenCalled();
+  });
+
+  it('restart cancels previous timeout — no double-fire', async () => {
+    const sdk = makeMockSdk();
+    connector(sdk as any);
+    await callAction(sdk, 'start', { slug: 'timer-1', duration: 10 });
+    await callAction(sdk, 'start', { slug: 'timer-1', duration: 20 });
+    vi.advanceTimersByTime(15_000);
+    const doneCalls = sdk.emit.mock.calls.filter(
+      ([, s]: [string, Record<string, unknown>]) => (s['timer-1'] as any)?.status === 'done'
+    );
+    expect(doneCalls.length).toBe(0);
+    vi.advanceTimersByTime(10_000);
+    expect(sdk.emit).toHaveBeenLastCalledWith('hubble-timer:state', expect.objectContaining({
+      'timer-1': expect.objectContaining({ status: 'done' }),
+    }));
+  });
+
+  it('returns error for unknown action', async () => {
+    const sdk = makeMockSdk();
+    connector(sdk as any);
+    const result = await callAction(sdk, 'explode', { slug: 'timer-1' });
+    expect(result).toEqual({ error: 'Unknown action: explode' });
+  });
+});
+
+describe('connector: storage recovery', () => {
+  beforeEach(() => { vi.useFakeTimers(); });
+  afterEach(() => { vi.useRealTimers(); });
+
+  it('restores running countdown and re-arms timeout for remaining duration', () => {
+    const startedAt = Date.now() - 10_000;
+    const stored = JSON.stringify({
+      'timer-1': { slug: 'timer-1', label: null, status: 'running', mode: 'countdown', duration: 30_000, startedAt, elapsed: 0 },
+    });
+    const sdk = makeMockSdk(stored);
+    connector(sdk as any);
+    expect(sdk.emit).toHaveBeenCalledWith('hubble-timer:state', expect.objectContaining({
+      'timer-1': expect.objectContaining({ status: 'running' }),
+    }));
+    vi.advanceTimersByTime(20_000);
+    expect(sdk.emit).toHaveBeenLastCalledWith('hubble-timer:state', expect.objectContaining({
+      'timer-1': expect.objectContaining({ status: 'done' }),
+    }));
+  });
+
+  it('fires done immediately if recovered countdown has already expired', () => {
+    const startedAt = Date.now() - 120_000;
+    const stored = JSON.stringify({
+      'timer-1': { slug: 'timer-1', label: null, status: 'running', mode: 'countdown', duration: 30_000, startedAt, elapsed: 0 },
+    });
+    const sdk = makeMockSdk(stored);
+    connector(sdk as any);
+    expect(sdk.emit).toHaveBeenLastCalledWith('hubble-timer:state', expect.objectContaining({
+      'timer-1': expect.objectContaining({ status: 'done' }),
+    }));
+  });
+
+  it('restores paused timer as-is with no timeout', () => {
+    const stored = JSON.stringify({
+      'timer-1': { slug: 'timer-1', label: 'Pizza', status: 'paused', mode: 'countdown', duration: 60_000, startedAt: null, elapsed: 20_000 },
+    });
+    const sdk = makeMockSdk(stored);
+    connector(sdk as any);
+    expect(sdk.emit).toHaveBeenCalledWith('hubble-timer:state', expect.objectContaining({
+      'timer-1': expect.objectContaining({ status: 'paused', elapsed: 20_000 }),
+    }));
+    vi.advanceTimersByTime(999_000);
+    const doneCalls = sdk.emit.mock.calls.filter(
+      ([, s]: [string, Record<string, unknown>]) => (s['timer-1'] as any)?.status === 'done'
+    );
+    expect(doneCalls.length).toBe(0);
+  });
+});
+
 const NOW = 1_000_000;
 
 describe('makeIdleState', () => {

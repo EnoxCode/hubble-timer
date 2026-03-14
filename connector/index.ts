@@ -1,16 +1,134 @@
-// HubbleTimer Connector
 import type { ServerSdk } from '../hubble-sdk';
+import {
+  TimerState,
+  makeIdleState,
+  startTimer,
+  pauseTimer,
+  resumeTimer,
+  resetTimer,
+  markDone,
+} from './timerState';
+
+const STORAGE_KEY = 'timerStates';
 
 export default function connector(sdk: ServerSdk) {
-  const config = sdk.getConfig();
+  const states: Record<string, TimerState> = {};
+  const timeouts = new Map<string, ReturnType<typeof setTimeout>>();
 
-  sdk.schedule(60000, async () => {
+  function persist() {
+    sdk.storage.set(STORAGE_KEY, JSON.stringify(states));
+  }
+
+  function emitAll() {
+    sdk.emit('hubble-timer:state', { ...states });
+  }
+
+  function getOrCreate(slug: string): TimerState {
+    if (!states[slug]) states[slug] = makeIdleState(slug);
+    return states[slug];
+  }
+
+  function clearDoneTimeout(slug: string) {
+    const handle = timeouts.get(slug);
+    if (handle != null) {
+      clearTimeout(handle);
+      timeouts.delete(slug);
+    }
+  }
+
+  function fireDoneNotify(slug: string) {
+    const configs = sdk.getWidgetConfigs() as Record<string, unknown>[];
+    const config = configs.find((c) => c['slug'] === slug);
+    if (!config) return;
+    if (config['doneNotify'] !== false) {
+      const label = (states[slug]?.label ?? config['title'] ?? slug) as string;
+      sdk.notify(`${label} is done!`, { level: 'info' });
+    }
+  }
+
+  function fireDone(slug: string) {
+    states[slug] = markDone(states[slug]);
+    persist();
+    emitAll();
+    fireDoneNotify(slug);
+  }
+
+  function armDoneTimeout(slug: string, remainingMs: number) {
+    clearDoneTimeout(slug);
+    if (remainingMs <= 0) {
+      fireDone(slug);
+      return;
+    }
+    const handle = setTimeout(() => {
+      fireDone(slug);
+    }, remainingMs);
+    timeouts.set(slug, handle);
+  }
+
+  // ── Restore from storage ─────────────────────────────────────────
+  const stored = sdk.storage.get(STORAGE_KEY);
+  if (stored && typeof stored === 'string') {
     try {
-      // TODO: Fetch data from your API
-      const data = { message: 'Hello from HubbleTimer' };
-      sdk.emit('hubbleTimer:data', data);
-    } catch (err) {
-      sdk.log.error(`Failed to fetch data: ${err}`);
+      const parsed = JSON.parse(stored) as Record<string, TimerState>;
+      for (const [slug, state] of Object.entries(parsed)) {
+        states[slug] = state;
+        if (state.status === 'running' && state.mode === 'countdown' && state.duration != null) {
+          const remaining = (state.startedAt ?? 0) + state.duration - Date.now();
+          armDoneTimeout(slug, remaining);
+        }
+      }
+      emitAll();
+    } catch (e) {
+      sdk.log.error(`Failed to restore timer states: ${e}`);
+    }
+  }
+
+  // ── API handler ──────────────────────────────────────────────────
+  sdk.onApiCall(async ({ action, params: _params, body }) => {
+    const { slug, duration, label } = body as { slug?: string; duration?: number; label?: string };
+    if (!slug) return { error: 'Missing slug' };
+
+    switch (action) {
+      case 'start': {
+        clearDoneTimeout(slug);
+        states[slug] = startTimer(getOrCreate(slug), { duration, label, now: Date.now() });
+        if (states[slug].mode === 'countdown' && states[slug].duration != null) {
+          armDoneTimeout(slug, states[slug].duration!);
+        }
+        persist();
+        emitAll();
+        return { ok: true };
+      }
+      case 'pause': {
+        const state = getOrCreate(slug);
+        if (state.status !== 'running') return { error: 'Timer not running' };
+        clearDoneTimeout(slug);
+        states[slug] = pauseTimer(state, Date.now());
+        persist();
+        emitAll();
+        return { ok: true };
+      }
+      case 'resume': {
+        const state = getOrCreate(slug);
+        if (state.status !== 'paused') return { error: 'Timer not paused' };
+        states[slug] = resumeTimer(state, Date.now());
+        if (states[slug].mode === 'countdown' && states[slug].duration != null) {
+          const remaining = states[slug].duration! - states[slug].elapsed;
+          armDoneTimeout(slug, remaining);
+        }
+        persist();
+        emitAll();
+        return { ok: true };
+      }
+      case 'reset': {
+        clearDoneTimeout(slug);
+        states[slug] = resetTimer(getOrCreate(slug));
+        persist();
+        emitAll();
+        return { ok: true };
+      }
+      default:
+        return { error: `Unknown action: ${action}` };
     }
   });
 }
