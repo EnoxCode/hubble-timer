@@ -101,3 +101,11 @@ describe('flash', () => {
     expect(container.firstChild).toHaveClass('stopwatch--flash');
   });
 });
+
+describe('done state', () => {
+  it('shows ELAPSED sublabel when done', () => {
+    setTimer({ status: 'done', elapsed: 60_000 });
+    render(<StopwatchViz />);
+    expect(screen.getByText('ELAPSED')).toBeInTheDocument();
+  });
+});
