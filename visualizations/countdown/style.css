@@ -60,7 +60,7 @@
   stroke: rgba(255, 255, 255, 0.08);
 }
 
-.countdown__track--done { stroke: transparent; }
+.countdown__track--done { stroke: color-mix(in srgb, var(--hubble-danger) 30%, transparent); }
 
 /* ── Ring arc ──────────────────────────────────────────── */
 .countdown__arc {
@@ -74,12 +74,6 @@
 .countdown__arc--dimmed { opacity: 0.25; }
 .countdown__arc--dashed { stroke: rgba(255, 255, 255, 0.15); }
 
-/* ── Done state: subtle red outline on panel ───────────── */
-.countdown--done {
-  outline: 1px solid var(--hubble-danger);
-  outline-color: color-mix(in srgb, var(--hubble-danger) 40%, transparent);
-  border-radius: var(--hubble-radius-lg);
-}
 
 /* ── Flash animation ───────────────────────────────────── */
 @keyframes countdown-flash {
