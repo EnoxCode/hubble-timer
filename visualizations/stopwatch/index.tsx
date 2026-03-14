@@ -38,6 +38,8 @@ function formatTime(ms: number): string {
   return `${m}:${s}`;
 }
 
+console.log('[stopwatch] module loaded');
+
 export default function StopwatchViz() {
   const allStates = useConnectorData<Record<string, TimerState>>();
   const config = useWidgetConfig<StopwatchConfig>();

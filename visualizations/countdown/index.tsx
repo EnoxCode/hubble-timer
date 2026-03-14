@@ -45,6 +45,8 @@ function formatTime(ms: number): string {
   return `${m}:${s}`;
 }
 
+console.log('[countdown] module loaded');
+
 export default function CountdownViz() {
   const allStates = useConnectorData<Record<string, TimerState>>();
   const config = useWidgetConfig<CountdownConfig>();
