@@ -1,0 +1,60 @@
+/* ── Container ─────────────────────────────────────────── */
+.stopwatch {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 24px 20px;
+}
+
+/* ── Size variants ─────────────────────────────────────── */
+.stopwatch--s  { --sw-font: 32px; }
+.stopwatch--m  { --sw-font: 42px; }
+.stopwatch--l  { --sw-font: 56px; }
+.stopwatch--xl { --sw-font: 72px; }
+
+/* ── Label ─────────────────────────────────────────────── */
+.stopwatch__label {
+  font-size: 12px;
+  letter-spacing: 2.5px;
+  color: rgba(255, 255, 255, 0.75);
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+/* ── Time digits ───────────────────────────────────────── */
+.stopwatch__time {
+  font-size: var(--sw-font);
+  font-weight: 800;
+  color: rgba(255, 255, 255, 0.95);
+  font-family: monospace;
+  letter-spacing: 2px;
+  line-height: 1;
+}
+
+.stopwatch__time--faded { color: rgba(255, 255, 255, 0.2); }
+
+/* ── Sub-label ─────────────────────────────────────────── */
+.stopwatch__sublabel {
+  font-size: 9px;
+  letter-spacing: 2px;
+  color: rgba(255, 255, 255, 0.35);
+  text-transform: uppercase;
+  margin-top: 2px;
+}
+
+.stopwatch__sublabel--waiting { color: rgba(255, 255, 255, 0.2); }
+.stopwatch__sublabel--paused  { color: var(--hubble-warning); }
+
+/* ── Paused state dims the time ────────────────────────── */
+.stopwatch--paused .stopwatch__time { color: rgba(255, 255, 255, 0.4); }
+
+/* ── Flash animation ───────────────────────────────────── */
+@keyframes stopwatch-flash {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.2; }
+}
+
+.stopwatch--flash {
+  animation: stopwatch-flash 0.8s ease-in-out infinite;
+}
