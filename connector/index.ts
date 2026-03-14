@@ -39,7 +39,10 @@ export default function connector(sdk: ServerSdk) {
   function fireDoneNotify(slug: string) {
     const configs = sdk.getWidgetConfigs() as Record<string, unknown>[];
     const config = configs.find((c) => c['slug'] === slug);
-    if (!config) return;
+    if (!config) {
+      sdk.log.warn(`Done fired for slug "${slug}" but no widget config found`);
+      return;
+    }
     if (config['doneNotify'] !== false) {
       const label = (states[slug]?.label ?? config['title'] ?? slug) as string;
       sdk.notify(`${label} is done!`, { level: 'info' });
@@ -73,8 +76,13 @@ export default function connector(sdk: ServerSdk) {
       for (const [slug, state] of Object.entries(parsed)) {
         states[slug] = state;
         if (state.status === 'running' && state.mode === 'countdown' && state.duration != null) {
-          const remaining = (state.startedAt ?? 0) + state.duration - Date.now();
-          armDoneTimeout(slug, remaining);
+          if (state.startedAt == null) {
+            sdk.log.warn(`Recovered running timer "${slug}" has null startedAt — firing done immediately`);
+            armDoneTimeout(slug, -1);
+          } else {
+            const remaining = state.startedAt + state.duration - Date.now();
+            armDoneTimeout(slug, remaining);
+          }
         }
       }
       emitAll();
@@ -84,7 +92,7 @@ export default function connector(sdk: ServerSdk) {
   }
 
   // ── API handler ──────────────────────────────────────────────────
-  sdk.onApiCall(async ({ action, params: _params, body }) => {
+  sdk.onApiCall(async ({ action, body }) => {
     const { slug, duration, label } = body as { slug?: string; duration?: number; label?: string };
     if (!slug) return { error: 'Missing slug' };
 
