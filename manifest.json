@@ -1,0 +1,32 @@
+{
+  "name": "hubble-timer",
+  "version": "0.1.0",
+  "description": "A timer that will be used for cooking timer, can be counting up or counting down.",
+  "minAppVersion": "0.1.0",
+  "type": [
+    "connector",
+    "visualization"
+  ],
+  "visualizations": [
+    {
+      "name": "default",
+      "description": "HubbleTimer default visualization",
+      "path": "default",
+      "selectable": true,
+      "hardwareButtons": {
+        "button1": "start",
+        "button2": "pause",
+        "button3": "stop",
+        "button4": "reset"
+      },
+      "properties": [
+        {
+          "name": "title",
+          "type": "string",
+          "required": true,
+          "description": "Widget title displayed in the edit interface"
+        }
+      ]
+    }
+  ]
+}
