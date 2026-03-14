@@ -53,6 +53,7 @@ export default function CountdownViz() {
 
   const timer: TimerState | null = allStates?.[config.slug] ?? null;
   timerRef.current = timer;
+  console.log('[countdown] config.slug:', config.slug, '| allStates keys:', allStates ? Object.keys(allStates) : null, '| timer:', timer?.status ?? 'null');
 
   // Tick every second while running so the display updates client-side
   const [, setTick] = useState(0);
