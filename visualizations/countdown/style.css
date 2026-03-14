@@ -1,0 +1,91 @@
+/* ── Container ─────────────────────────────────────────── */
+.countdown {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 20px;
+}
+
+/* ── Size variants (CSS custom properties for SVG scaling) */
+.countdown--s  { --ring-size: 80px;  --ring-font: 14px; }
+.countdown--m  { --ring-size: 108px; --ring-font: 19px; }
+.countdown--l  { --ring-size: 140px; --ring-font: 26px; }
+.countdown--xl { --ring-size: 180px; --ring-font: 34px; }
+
+/* ── Label above ring ──────────────────────────────────── */
+.countdown__label {
+  font-size: 12px;
+  letter-spacing: 2.5px;
+  color: rgba(255, 255, 255, 0.75);
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.countdown__label--faded {
+  color: rgba(255, 255, 255, 0.3);
+}
+
+/* ── SVG ring wrapper ──────────────────────────────────── */
+.countdown__ring {
+  width: var(--ring-size);
+  height: var(--ring-size);
+}
+
+/* ── Time text (SVG) ───────────────────────────────────── */
+.countdown__time {
+  font-size: var(--ring-font);
+  font-weight: 800;
+  font-family: monospace;
+  fill: rgba(255, 255, 255, 0.95);
+}
+
+.countdown__time--faded { fill: rgba(255, 255, 255, 0.45); }
+.countdown__time--done  { fill: var(--hubble-danger); }
+
+/* ── Sub-label text (SVG) ──────────────────────────────── */
+.countdown__sublabel {
+  font-size: 8px;
+  letter-spacing: 2px;
+  fill: rgba(255, 255, 255, 0.35);
+  text-transform: uppercase;
+}
+
+.countdown__sublabel--paused { fill: var(--hubble-warning); }
+.countdown__sublabel--done   { fill: var(--hubble-danger); }
+
+/* ── Ring track ────────────────────────────────────────── */
+.countdown__track {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.08);
+}
+
+.countdown__track--done { stroke: transparent; }
+
+/* ── Ring arc ──────────────────────────────────────────── */
+.countdown__arc {
+  fill: none;
+  stroke: var(--hubble-success);
+  stroke-linecap: round;
+  transition: stroke-dasharray 0.5s linear;
+}
+
+.countdown__arc--red    { stroke: var(--hubble-danger); }
+.countdown__arc--dimmed { opacity: 0.25; }
+.countdown__arc--dashed { stroke: rgba(255, 255, 255, 0.15); }
+
+/* ── Done state: subtle red outline on panel ───────────── */
+.countdown--done {
+  outline: 1px solid rgba(231, 76, 60, 0.4);
+  border-radius: var(--hubble-radius-lg);
+}
+
+/* ── Flash animation ───────────────────────────────────── */
+@keyframes countdown-flash {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.2; }
+}
+
+.countdown--flash {
+  animation: countdown-flash 0.8s ease-in-out infinite;
+}

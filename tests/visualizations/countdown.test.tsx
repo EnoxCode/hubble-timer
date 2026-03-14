@@ -1,0 +1,110 @@
+import React from 'react';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { render, screen } from '@testing-library/react';
+import { useConnectorData, useWidgetConfig, useHubbleSDK } from '@hubble/sdk';
+import CountdownViz from '../../visualizations/countdown/index';
+
+vi.mock('@hubble/sdk', () => ({
+  useConnectorData: vi.fn(),
+  useWidgetConfig: vi.fn(),
+  useHubbleSDK: vi.fn(() => ({ onButton: vi.fn(() => vi.fn()), requestAcknowledge: vi.fn() })),
+}));
+
+const mockData = useConnectorData as ReturnType<typeof vi.fn>;
+const mockConfig = useWidgetConfig as ReturnType<typeof vi.fn>;
+
+function setConfig(overrides = {}) {
+  mockConfig.mockReturnValue({
+    slug: 'timer-1', title: 'Pizza', size: 'm',
+    doneNotify: true, doneExpand: false, doneFlash: false, warningThreshold: 300,
+    ...overrides,
+  });
+}
+
+function setTimer(overrides = {}) {
+  mockData.mockReturnValue({
+    'timer-1': {
+      slug: 'timer-1', label: null, status: 'idle', mode: 'countdown',
+      duration: null, startedAt: null, elapsed: 0,
+      ...overrides,
+    },
+  });
+}
+
+beforeEach(() => { setConfig(); setTimer(); });
+
+describe('idle state', () => {
+  it('shows --:-- and WAITING', () => {
+    render(<CountdownViz />);
+    expect(screen.getByText('--:--')).toBeInTheDocument();
+    expect(screen.getByText('WAITING')).toBeInTheDocument();
+  });
+});
+
+describe('running state', () => {
+  it('shows REMAINING and label', () => {
+    setTimer({ status: 'running', label: 'Pizza', duration: 600_000, startedAt: Date.now(), elapsed: 0 });
+    render(<CountdownViz />);
+    expect(screen.getByText('REMAINING')).toBeInTheDocument();
+    expect(screen.getByText('Pizza')).toBeInTheDocument();
+  });
+
+  it('falls back to title when label is null', () => {
+    setConfig({ slug: 'timer-1', title: 'Oven Timer', size: 'm', doneNotify: true, doneExpand: false, doneFlash: false, warningThreshold: 300 });
+    setTimer({ status: 'running', label: null, duration: 600_000, startedAt: Date.now(), elapsed: 0 });
+    render(<CountdownViz />);
+    expect(screen.getByText('Oven Timer')).toBeInTheDocument();
+  });
+});
+
+describe('paused state', () => {
+  it('shows PAUSED', () => {
+    setTimer({ status: 'paused', duration: 600_000, elapsed: 10_000 });
+    render(<CountdownViz />);
+    expect(screen.getByText('PAUSED')).toBeInTheDocument();
+  });
+});
+
+describe('done state', () => {
+  it('shows 00:00 and DONE', () => {
+    setTimer({ status: 'done', duration: 600_000, elapsed: 600_000 });
+    render(<CountdownViz />);
+    expect(screen.getByText('00:00')).toBeInTheDocument();
+    expect(screen.getByText('DONE')).toBeInTheDocument();
+  });
+
+  it('applies countdown--done class', () => {
+    setTimer({ status: 'done', duration: 600_000, elapsed: 600_000 });
+    const { container } = render(<CountdownViz />);
+    expect(container.firstChild).toHaveClass('countdown--done');
+  });
+
+  it('applies countdown--flash when doneFlash is true', () => {
+    setConfig({ doneFlash: true });
+    setTimer({ status: 'done', duration: 600_000, elapsed: 600_000 });
+    const { container } = render(<CountdownViz />);
+    expect(container.firstChild).toHaveClass('countdown--flash');
+  });
+});
+
+describe('size prop', () => {
+  it('applies countdown--l class when size is l', () => {
+    setConfig({ size: 'l' });
+    const { container } = render(<CountdownViz />);
+    expect(container.firstChild).toHaveClass('countdown--l');
+  });
+});
+
+describe('slug filtering', () => {
+  it('shows idle when state map has no entry for this slug', () => {
+    mockData.mockReturnValue({ 'other': { slug: 'other', status: 'running' } });
+    render(<CountdownViz />);
+    expect(screen.getByText('WAITING')).toBeInTheDocument();
+  });
+
+  it('shows idle when connector data is null', () => {
+    mockData.mockReturnValue(null);
+    render(<CountdownViz />);
+    expect(screen.getByText('WAITING')).toBeInTheDocument();
+  });
+});
