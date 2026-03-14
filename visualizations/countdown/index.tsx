@@ -48,7 +48,7 @@ function formatTime(ms: number): string {
 console.log('[countdown] module loaded');
 
 export default function CountdownViz() {
-  const allStates = useConnectorData<Record<string, TimerState>>();
+  const allStates = useConnectorData<Record<string, TimerState>>('hubble-timer', 'hubble-timer:state');
   const config = useWidgetConfig<CountdownConfig>();
   const sdk = useHubbleSDK();
   const timerRef = useRef<TimerState | null>(null);

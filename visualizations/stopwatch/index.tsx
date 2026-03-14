@@ -41,7 +41,7 @@ function formatTime(ms: number): string {
 console.log('[stopwatch] module loaded');
 
 export default function StopwatchViz() {
-  const allStates = useConnectorData<Record<string, TimerState>>();
+  const allStates = useConnectorData<Record<string, TimerState>>('hubble-timer', 'hubble-timer:state');
   const config = useWidgetConfig<StopwatchConfig>();
   const sdk = useHubbleSDK();
   const timerRef = useRef<TimerState | null>(null);
