@@ -85,6 +85,15 @@ describe('done state', () => {
     const { container } = render(<CountdownViz />);
     expect(container.firstChild).toHaveClass('countdown--flash');
   });
+
+  it('calls requestAcknowledge when doneExpand is true', () => {
+    const mockSdk = { onButton: vi.fn(() => vi.fn()), requestAcknowledge: vi.fn() };
+    (useHubbleSDK as ReturnType<typeof vi.fn>).mockReturnValue(mockSdk);
+    setConfig({ doneExpand: true });
+    setTimer({ status: 'done', duration: 600_000, elapsed: 600_000 });
+    render(<CountdownViz />);
+    expect(mockSdk.requestAcknowledge).toHaveBeenCalled();
+  });
 });
 
 describe('size prop', () => {

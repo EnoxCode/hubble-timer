@@ -76,7 +76,8 @@
 
 /* ── Done state: subtle red outline on panel ───────────── */
 .countdown--done {
-  outline: 1px solid rgba(231, 76, 60, 0.4);
+  outline: 1px solid var(--hubble-danger);
+  outline-color: color-mix(in srgb, var(--hubble-danger) 40%, transparent);
   border-radius: var(--hubble-radius-lg);
 }
 
