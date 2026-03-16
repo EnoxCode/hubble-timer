@@ -1,9 +1,12 @@
 {
   "name": "hubble-timer",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "A cooking timer with countdown and stopwatch modes.",
   "minAppVersion": "0.1.0",
-  "type": ["connector", "visualization"],
+  "type": [
+    "connector",
+    "visualization"
+  ],
   "endpoints": [
     {
       "name": "start",
@@ -12,11 +15,22 @@
       "description": "Start or restart a timer",
       "body": {
         "type": "object",
-        "required": ["slug"],
+        "required": [
+          "slug"
+        ],
         "properties": {
-          "slug": { "type": "string", "description": "Widget slug to target" },
-          "duration": { "type": "number", "description": "Duration in seconds (omit for stopwatch)" },
-          "label": { "type": "string", "description": "Optional display label for this run" }
+          "slug": {
+            "type": "string",
+            "description": "Widget slug to target"
+          },
+          "duration": {
+            "type": "number",
+            "description": "Duration in seconds (omit for stopwatch)"
+          },
+          "label": {
+            "type": "string",
+            "description": "Optional display label for this run"
+          }
         }
       }
     },
@@ -27,9 +41,14 @@
       "description": "Pause a running timer",
       "body": {
         "type": "object",
-        "required": ["slug"],
+        "required": [
+          "slug"
+        ],
         "properties": {
-          "slug": { "type": "string", "description": "Widget slug to target" }
+          "slug": {
+            "type": "string",
+            "description": "Widget slug to target"
+          }
         }
       }
     },
@@ -40,9 +59,14 @@
       "description": "Resume a paused timer",
       "body": {
         "type": "object",
-        "required": ["slug"],
+        "required": [
+          "slug"
+        ],
         "properties": {
-          "slug": { "type": "string", "description": "Widget slug to target" }
+          "slug": {
+            "type": "string",
+            "description": "Widget slug to target"
+          }
         }
       }
     },
@@ -53,9 +77,14 @@
       "description": "Reset a timer to idle",
       "body": {
         "type": "object",
-        "required": ["slug"],
+        "required": [
+          "slug"
+        ],
         "properties": {
-          "slug": { "type": "string", "description": "Widget slug to target" }
+          "slug": {
+            "type": "string",
+            "description": "Widget slug to target"
+          }
         }
       }
     }
@@ -71,13 +100,74 @@
         "button2": "reset"
       },
       "properties": [
-        { "name": "title", "type": "string", "required": true, "description": "Display name when no API label is active" },
-        { "name": "slug", "type": "string", "required": true, "description": "Stable API identifier (e.g. timer-1)" },
-        { "name": "size", "type": "choice", "required": false, "default": "m", "description": "Widget size", "choices": [{"label": "Small", "value": "s"}, {"label": "Medium", "value": "m"}, {"label": "Large", "value": "l"}, {"label": "Extra Large", "value": "xl"}] },
-        { "name": "doneNotify", "type": "boolean", "required": false, "default": true, "description": "Send notification when done" },
-        { "name": "doneExpand", "type": "boolean", "required": false, "default": false, "description": "Expand full-screen when done (requires hardware button to dismiss)" },
-        { "name": "doneFlash", "type": "boolean", "required": false, "default": false, "description": "Flash the widget when done" },
-        { "name": "warningThreshold", "type": "range", "required": false, "default": 300, "description": "Seconds remaining when ring turns red", "min": 0, "max": 3600, "step": 30 }
+        {
+          "name": "title",
+          "type": "string",
+          "required": true,
+          "description": "Display name when no API label is active"
+        },
+        {
+          "name": "slug",
+          "type": "string",
+          "required": true,
+          "description": "Stable API identifier (e.g. timer-1)"
+        },
+        {
+          "name": "size",
+          "type": "choice",
+          "required": false,
+          "default": "m",
+          "description": "Widget size",
+          "choices": [
+            {
+              "label": "Small",
+              "value": "s"
+            },
+            {
+              "label": "Medium",
+              "value": "m"
+            },
+            {
+              "label": "Large",
+              "value": "l"
+            },
+            {
+              "label": "Extra Large",
+              "value": "xl"
+            }
+          ]
+        },
+        {
+          "name": "doneNotify",
+          "type": "boolean",
+          "required": false,
+          "default": true,
+          "description": "Send notification when done"
+        },
+        {
+          "name": "doneExpand",
+          "type": "boolean",
+          "required": false,
+          "default": false,
+          "description": "Expand full-screen when done (requires hardware button to dismiss)"
+        },
+        {
+          "name": "doneFlash",
+          "type": "boolean",
+          "required": false,
+          "default": false,
+          "description": "Flash the widget when done"
+        },
+        {
+          "name": "warningThreshold",
+          "type": "range",
+          "required": false,
+          "default": 300,
+          "description": "Seconds remaining when ring turns red",
+          "min": 0,
+          "max": 3600,
+          "step": 30
+        }
       ]
     },
     {
@@ -90,12 +180,64 @@
         "button2": "reset"
       },
       "properties": [
-        { "name": "title", "type": "string", "required": true, "description": "Display name when no API label is active" },
-        { "name": "slug", "type": "string", "required": true, "description": "Stable API identifier (e.g. timer-1)" },
-        { "name": "size", "type": "choice", "required": false, "default": "m", "description": "Widget size", "choices": [{"label": "Small", "value": "s"}, {"label": "Medium", "value": "m"}, {"label": "Large", "value": "l"}, {"label": "Extra Large", "value": "xl"}] },
-        { "name": "doneNotify", "type": "boolean", "required": false, "default": true, "description": "Send notification when done" },
-        { "name": "doneExpand", "type": "boolean", "required": false, "default": false, "description": "Expand full-screen when done (requires hardware button to dismiss)" },
-        { "name": "doneFlash", "type": "boolean", "required": false, "default": false, "description": "Flash the widget when done" }
+        {
+          "name": "title",
+          "type": "string",
+          "required": true,
+          "description": "Display name when no API label is active"
+        },
+        {
+          "name": "slug",
+          "type": "string",
+          "required": true,
+          "description": "Stable API identifier (e.g. timer-1)"
+        },
+        {
+          "name": "size",
+          "type": "choice",
+          "required": false,
+          "default": "m",
+          "description": "Widget size",
+          "choices": [
+            {
+              "label": "Small",
+              "value": "s"
+            },
+            {
+              "label": "Medium",
+              "value": "m"
+            },
+            {
+              "label": "Large",
+              "value": "l"
+            },
+            {
+              "label": "Extra Large",
+              "value": "xl"
+            }
+          ]
+        },
+        {
+          "name": "doneNotify",
+          "type": "boolean",
+          "required": false,
+          "default": true,
+          "description": "Send notification when done"
+        },
+        {
+          "name": "doneExpand",
+          "type": "boolean",
+          "required": false,
+          "default": false,
+          "description": "Expand full-screen when done (requires hardware button to dismiss)"
+        },
+        {
+          "name": "doneFlash",
+          "type": "boolean",
+          "required": false,
+          "default": false,
+          "description": "Flash the widget when done"
+        }
       ]
     }
   ]
