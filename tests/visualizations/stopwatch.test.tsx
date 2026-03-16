@@ -1,7 +1,7 @@
 import React from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import { useConnectorData, useWidgetConfig, useHubbleSDK } from '@hubble/sdk';
+import { useConnectorData, useWidgetConfig } from '@hubble/sdk';
 import StopwatchViz from '../../visualizations/stopwatch/index';
 
 vi.mock('@hubble/sdk', () => ({
@@ -16,7 +16,7 @@ const mockConfig = useWidgetConfig as ReturnType<typeof vi.fn>;
 function setConfig(overrides = {}) {
   mockConfig.mockReturnValue({
     slug: 'sw-1', title: 'Soup', size: 'm',
-    doneExpand: false, doneFlash: false,
+    showMilliseconds: false,
     ...overrides,
   });
 }
@@ -50,7 +50,7 @@ describe('running state', () => {
   });
 
   it('falls back to title when label is null', () => {
-    setConfig({ slug: 'sw-1', title: 'Stock Pot', size: 'm', doneExpand: false, doneFlash: false });
+    setConfig({ slug: 'sw-1', title: 'Stock Pot', size: 'm' });
     setTimer({ status: 'running', label: null, startedAt: Date.now(), elapsed: 0 });
     render(<StopwatchViz />);
     expect(screen.getByText('Stock Pot')).toBeInTheDocument();
@@ -64,18 +64,24 @@ describe('paused state', () => {
     expect(screen.getByText('PAUSED')).toBeInTheDocument();
   });
 
-  it('applies stopwatch--paused class', () => {
+  it('sets data-state="paused" on root', () => {
     setTimer({ status: 'paused', elapsed: 12_000 });
     const { container } = render(<StopwatchViz />);
-    expect(container.firstChild).toHaveClass('stopwatch--paused');
+    expect(container.firstChild).toHaveAttribute('data-state', 'paused');
   });
 });
 
 describe('size prop', () => {
-  it('applies stopwatch--xl class when size is xl', () => {
+  it('sets data-size="xl" when size is xl', () => {
     setConfig({ size: 'xl' });
     const { container } = render(<StopwatchViz />);
-    expect(container.firstChild).toHaveClass('stopwatch--xl');
+    expect(container.firstChild).toHaveAttribute('data-size', 'xl');
+  });
+
+  it('xl size omits dash-glass shell', () => {
+    setConfig({ size: 'xl' });
+    const { container } = render(<StopwatchViz />);
+    expect(container.firstChild).not.toHaveClass('dash-glass');
   });
 });
 
@@ -93,28 +99,18 @@ describe('slug filtering', () => {
   });
 });
 
-describe('flash', () => {
-  it('applies stopwatch--flash class when doneFlash true and status done', () => {
-    setConfig({ doneFlash: true });
-    setTimer({ status: 'done', elapsed: 0 });
+describe('milliseconds', () => {
+  it('shows ms suffix when showMilliseconds is true', () => {
+    setConfig({ showMilliseconds: true });
+    setTimer({ status: 'running', startedAt: Date.now() - 5432, elapsed: 0 });
     const { container } = render(<StopwatchViz />);
-    expect(container.firstChild).toHaveClass('stopwatch--flash');
-  });
-});
-
-describe('done state', () => {
-  it('shows ELAPSED sublabel when done', () => {
-    setTimer({ status: 'done', elapsed: 60_000 });
-    render(<StopwatchViz />);
-    expect(screen.getByText('ELAPSED')).toBeInTheDocument();
+    expect(container.querySelector('.timer-sw-ms')).not.toBeNull();
   });
 
-  it('calls requestAcknowledge when doneExpand is true', () => {
-    const mockSdk = { onButton: vi.fn(() => vi.fn()), requestAcknowledge: vi.fn() };
-    (useHubbleSDK as ReturnType<typeof vi.fn>).mockReturnValue(mockSdk);
-    setConfig({ doneExpand: true });
-    setTimer({ status: 'done', elapsed: 60_000 });
-    render(<StopwatchViz />);
-    expect(mockSdk.requestAcknowledge).toHaveBeenCalled();
+  it('hides ms suffix when showMilliseconds is false', () => {
+    setConfig({ showMilliseconds: false });
+    setTimer({ status: 'running', startedAt: Date.now(), elapsed: 0 });
+    const { container } = render(<StopwatchViz />);
+    expect(container.querySelector('.timer-sw-ms')).toBeNull();
   });
 });

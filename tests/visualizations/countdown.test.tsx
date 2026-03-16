@@ -67,24 +67,24 @@ describe('paused state', () => {
 });
 
 describe('done state', () => {
-  it('shows 00:00 and DONE', () => {
+  it('shows 0:00 and DONE', () => {
     setTimer({ status: 'done', duration: 600_000, elapsed: 600_000 });
     render(<CountdownViz />);
-    expect(screen.getByText('00:00')).toBeInTheDocument();
+    expect(screen.getByText('0:00')).toBeInTheDocument();
     expect(screen.getByText('DONE')).toBeInTheDocument();
   });
 
-  it('applies countdown--done class', () => {
+  it('sets data-state="done" on root', () => {
     setTimer({ status: 'done', duration: 600_000, elapsed: 600_000 });
     const { container } = render(<CountdownViz />);
-    expect(container.firstChild).toHaveClass('countdown--done');
+    expect(container.firstChild).toHaveAttribute('data-state', 'done');
   });
 
-  it('applies countdown--flash when doneFlash is true', () => {
+  it('sets data-flash="true" when doneFlash is true', () => {
     setConfig({ doneFlash: true });
     setTimer({ status: 'done', duration: 600_000, elapsed: 600_000 });
     const { container } = render(<CountdownViz />);
-    expect(container.firstChild).toHaveClass('countdown--flash');
+    expect(container.firstChild).toHaveAttribute('data-flash', 'true');
   });
 
   it('calls requestAcknowledge when doneExpand is true', () => {
@@ -98,10 +98,16 @@ describe('done state', () => {
 });
 
 describe('size prop', () => {
-  it('applies countdown--l class when size is l', () => {
+  it('sets data-size="l" when size is l', () => {
     setConfig({ size: 'l' });
     const { container } = render(<CountdownViz />);
-    expect(container.firstChild).toHaveClass('countdown--l');
+    expect(container.firstChild).toHaveAttribute('data-size', 'l');
+  });
+
+  it('xl size omits dash-glass shell', () => {
+    setConfig({ size: 'xl' });
+    const { container } = render(<CountdownViz />);
+    expect(container.firstChild).not.toHaveClass('dash-glass');
   });
 });
 
@@ -148,11 +154,9 @@ describe('hardware buttons', () => {
 });
 
 describe('warning threshold', () => {
-  it('applies countdown__arc--red class when time remaining is below warningThreshold', () => {
-    // warningThreshold is 300s = 300_000ms; set remaining < 300s
+  it('sets data-state="warning" when time remaining is below warningThreshold', () => {
     const now = Date.now();
-    setConfig({ warningThreshold: 300 }); // default
-    // elapsed + (now - startedAt) = 590s out of 600s → remaining = 10s < 300s threshold
+    setConfig({ warningThreshold: 300 });
     setTimer({
       status: 'running',
       duration: 600_000,
@@ -160,14 +164,12 @@ describe('warning threshold', () => {
       elapsed: 0,
     });
     const { container } = render(<CountdownViz />);
-    const redArc = container.querySelector('.countdown__arc--red');
-    expect(redArc).not.toBeNull();
+    expect(container.firstChild).toHaveAttribute('data-state', 'warning');
   });
 
-  it('does not apply countdown__arc--red when above threshold', () => {
+  it('sets data-state="running" when above threshold', () => {
     const now = Date.now();
     setConfig({ warningThreshold: 300 });
-    // only 10s elapsed → remaining = 590s > 300s
     setTimer({
       status: 'running',
       duration: 600_000,
@@ -175,8 +177,7 @@ describe('warning threshold', () => {
       elapsed: 0,
     });
     const { container } = render(<CountdownViz />);
-    const redArc = container.querySelector('.countdown__arc--red');
-    expect(redArc).toBeNull();
+    expect(container.firstChild).toHaveAttribute('data-state', 'running');
   });
 });
 

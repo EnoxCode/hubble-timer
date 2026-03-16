@@ -237,6 +237,13 @@
           "required": false,
           "default": false,
           "description": "Flash the widget when done"
+        },
+        {
+          "name": "showMilliseconds",
+          "type": "boolean",
+          "required": false,
+          "default": false,
+          "description": "Show .xx subsecond suffix in smaller text"
         }
       ]
     }

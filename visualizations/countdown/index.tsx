@@ -32,17 +32,20 @@ interface CountdownConfig {
   warningThreshold: number;
 }
 
-const RING_RADIUS = 44;
-const RING_CIRCUMFERENCE = 2 * Math.PI * RING_RADIUS;
-const VIEWBOX = 100;
-const CX = VIEWBOX / 2;
-const CY = VIEWBOX / 2;
+const CIRCUMFERENCE = 2 * Math.PI * 40; // r=40, ≈251.3
 
 function formatTime(ms: number): string {
   const totalSec = Math.ceil(ms / 1000);
-  const m = Math.floor(totalSec / 60).toString().padStart(2, '0');
-  const s = (totalSec % 60).toString().padStart(2, '0');
-  return `${m}:${s}`;
+  const m = Math.floor(totalSec / 60);
+  const s = totalSec % 60;
+  return `${m}:${s.toString().padStart(2, '0')}`;
+}
+
+function getArcDasharray(secondsRemaining: number, totalSeconds: number): string {
+  const progress = Math.max(0, Math.min(1, secondsRemaining / totalSeconds));
+  const arcLength = CIRCUMFERENCE * progress;
+  const gapLength = CIRCUMFERENCE - arcLength;
+  return `${arcLength.toFixed(1)} ${gapLength.toFixed(1)}`;
 }
 
 export default function CountdownViz() {
@@ -54,7 +57,6 @@ export default function CountdownViz() {
   const timer: TimerState | null = allStates?.[config.slug] ?? null;
   timerRef.current = timer;
 
-  // Tick every second while running so the display updates client-side
   const [, setTick] = useState(0);
   useEffect(() => {
     if (timer?.status !== 'running') return;
@@ -62,7 +64,6 @@ export default function CountdownViz() {
     return () => clearInterval(id);
   }, [timer?.status]);
 
-  // Hardware buttons
   useEffect(() => {
     const unsubToggle = sdk.onButton('button1', async () => {
       const action = timerRef.current?.status === 'running' ? 'pause' : 'resume';
@@ -82,7 +83,6 @@ export default function CountdownViz() {
     return () => { unsubToggle(); unsubReset(); };
   }, [sdk, config.slug]);
 
-  // Done expand behavior (client-side presentation API)
   useEffect(() => {
     if (timer?.status === 'done' && config.doneExpand) {
       sdk.requestAcknowledge();
@@ -90,94 +90,98 @@ export default function CountdownViz() {
   }, [timer?.status, config.doneExpand, sdk]);
 
   // ── Derived display values ─────────────────────────────
-  const status = timer?.status ?? 'idle';
+  const baseStatus = timer?.status ?? 'idle';
   const label = timer?.label ?? config.title;
   const size = config.size ?? 'm';
   const warningMs = (config.warningThreshold ?? 300) * 1000;
+  const isXl = size === 'xl';
 
   let displayMs = 0;
-  let arcRatio = 0;
   let timeText = '--:--';
+  let dasharray = `0 ${CIRCUMFERENCE.toFixed(1)}`;
 
-  if (status === 'done') {
-    timeText = '00:00';
-    arcRatio = 0;
-  } else if (status !== 'idle' && timer) {
+  if (baseStatus === 'done') {
+    timeText = '0:00';
+  } else if (baseStatus !== 'idle' && timer) {
     displayMs = computeDisplayMs(timer, Date.now());
     timeText = formatTime(displayMs);
-    if (timer.duration) arcRatio = displayMs / timer.duration;
+    if (timer.duration) {
+      dasharray = getArcDasharray(displayMs / 1000, timer.duration / 1000);
+    }
   }
 
-  const isRunning = status === 'running';
-  const isPaused = status === 'paused';
-  const isDone = status === 'done';
-  const isIdle = status === 'idle';
-  const isRed = isRunning && displayMs <= warningMs && displayMs > 0;
-  const doFlash = isDone && config.doneFlash;
+  // Warning auto-derives from running state
+  const isWarning = baseStatus === 'running' && displayMs > 0 && displayMs <= warningMs;
+  const state = isWarning ? 'warning' : baseStatus;
 
-  const arcLength = arcRatio * RING_CIRCUMFERENCE;
-  const gapLength = RING_CIRCUMFERENCE - arcLength;
+  const stateLabel = state === 'done'
+    ? 'DONE'
+    : state === 'paused'
+      ? 'PAUSED'
+      : state === 'idle'
+        ? 'WAITING'
+        : 'REMAINING';
 
-  const containerClass = [
-    'countdown',
-    `countdown--${size}`,
-    isDone ? 'countdown--done' : '',
-    doFlash ? 'countdown--flash' : '',
-  ].filter(Boolean).join(' ');
+  const showShell = !isXl;
 
   return (
-    <div className={containerClass}>
-      {!isIdle && (
-        <span className={`countdown__label${isPaused || isDone ? ' countdown__label--faded' : ''}`}>
-          {label}
-        </span>
+    <div
+      className={`timer-countdown${showShell ? ' dash-glass dash-widget' : ''}`}
+      data-state={state}
+      data-size={size}
+      data-flash={config.doneFlash && state === 'done' ? 'true' : undefined}
+    >
+      {showShell && label && (
+        <div className="dash-widget-header">
+          <span className="t-label">{label}</span>
+        </div>
       )}
-      <svg
-        className="countdown__ring"
-        viewBox={`0 0 ${VIEWBOX} ${VIEWBOX}`}
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <circle
-          className={`countdown__track${isDone ? ' countdown__track--done' : ''}`}
-          cx={CX} cy={CY} r={RING_RADIUS} strokeWidth={8}
-        />
-        {!isDone && (
+
+      <div className="timer-ring-wrap">
+        <svg width="100" height="100" viewBox="0 0 100 100" className="timer-ring-svg">
+          {/* Track — always full circle */}
           <circle
-            className={[
-              'countdown__arc',
-              isIdle ? 'countdown__arc--dashed' : '',
-              isRed ? 'countdown__arc--red' : '',
-              isPaused ? 'countdown__arc--dimmed' : '',
-            ].filter(Boolean).join(' ')}
-            cx={CX} cy={CY} r={RING_RADIUS} strokeWidth={8}
-            strokeDasharray={isIdle ? '7 5' : `${arcLength} ${gapLength}`}
-            strokeDashoffset={0}
-            transform={`rotate(-90 ${CX} ${CY})`}
+            className={`timer-ring-track${state === 'done' ? ' timer-ring-track--done' : ''}`}
+            cx="50" cy="50" r="40"
+            fill="none"
+            stroke={state === 'done' ? 'rgba(248,113,113,0.20)' : 'rgba(255,255,255,0.07)'}
+            strokeWidth="4"
           />
-        )}
-        <text
-          className={[
-            'countdown__time',
-            isPaused ? 'countdown__time--faded' : '',
-            isDone ? 'countdown__time--done' : '',
-          ].filter(Boolean).join(' ')}
-          x={CX} y={CY - 5}
-          textAnchor="middle" dominantBaseline="middle"
-        >
-          {timeText}
-        </text>
-        <text
-          className={[
-            'countdown__sublabel',
-            isDone ? 'countdown__sublabel--done' : '',
-            isPaused ? 'countdown__sublabel--paused' : '',
-          ].filter(Boolean).join(' ')}
-          x={CX} y={CY + 13}
-          textAnchor="middle"
-        >
-          {isDone ? 'DONE' : isPaused ? 'PAUSED' : isIdle ? 'WAITING' : 'REMAINING'}
-        </text>
-      </svg>
+          {/* Arc */}
+          {state === 'idle' ? (
+            <circle
+              className="timer-ring-arc timer-ring-arc--idle"
+              cx="50" cy="50" r="40"
+              fill="none"
+              stroke="rgba(255,255,255,0.18)"
+              strokeWidth="3"
+              strokeDasharray="6 8"
+              strokeLinecap="round"
+              transform="rotate(-90 50 50)"
+            />
+          ) : state !== 'done' && (
+            <circle
+              className="timer-ring-arc"
+              cx="50" cy="50" r="40"
+              fill="none"
+              stroke="var(--timer-arc-color)"
+              strokeWidth="4"
+              strokeDasharray={dasharray}
+              strokeLinecap="round"
+              transform="rotate(-90 50 50)"
+            />
+          )}
+        </svg>
+
+        <div className="timer-ring-center">
+          <div className="timer-time">{timeText}</div>
+          <div className="timer-state-label">{stateLabel}</div>
+        </div>
+      </div>
+
+      {!showShell && label && (
+        <div className="timer-ambient-label t-label">{label}</div>
+      )}
     </div>
   );
 }

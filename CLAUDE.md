@@ -1,6 +1,6 @@
 # HubbleTimer
 
-A timer that will be used for cooking timer, can be counting up or counting down.
+A cooking timer with countdown and stopwatch modes.
 
 This is a Hubble module (type: **connector + visualization**). Hubble is an Electron-based kitchen dashboard that runs on a Raspberry Pi with a portrait 1920x1080 screen.
 
@@ -95,8 +95,61 @@ vi.mock('@hubble/sdk', () => ({
 ## UI Styling Rules
 
 - **No inline styles** — never use `style="..."` on HTML elements or the `style` prop in React/TSX.
-- **Use stylesheet classes** — all styles go in `visualizations/<path>/style.css`. Use `--hubble-*` CSS variables for automatic theming.
+- **Use stylesheet classes** — all styles go in `visualizations/<path>/style.css`. Use `--dash-*` CSS variables for dashboard visualizations (`hubble-dash-ui`) and `--hubble-*` for admin/edit UI (`hubble-ui`).
 - **Use `hubble-ui` components** — always prefer components from `hubble-ui` over writing custom equivalents.
+
+### hubble-dash-ui components (dashboard visualizations)
+
+Dashboard visualizations use `hubble-dash-ui` — never `hubble-ui`.
+
+```tsx
+import {
+  DashWidget, DashWidgetHeader, DashWidgetFooter,
+  DashStatusDot, DashSkeleton, DashDivider,
+  DashBadge, DashPill, DashCarouselDots, DashThumbnail,
+} from 'hubble-dash-ui';
+import 'hubble-dash-ui/styles/dash-base.css';
+```
+
+| Component | Purpose |
+|---|---|
+| `DashWidget` | Glass panel shell — wraps all widget content |
+| `DashWidgetHeader` | Label (left) + optional meta/custom slot (right) |
+| `DashWidgetFooter` | Auto-formatted relative timestamp + status dot |
+| `DashStatusDot` | 5px status dot (`ok` / `warn` / `error`) |
+| `DashSkeleton` | Shimmer loading placeholder |
+| `DashDivider` | Hairline section separator |
+| `DashBadge` | Tinted state value chip — `positive`, `warning`, `critical`, `info`, `neutral` |
+| `DashPill` | Event / status pill — `glass` (strip) or `full` (tinted bg); `DashPill.Dot` for compact dots |
+| `DashCarouselDots` | Navigation dots — active expands to pill shape |
+| `DashThumbnail` | Image container with `object-fit: cover` + auto empty-state |
+
+### Shell variant quick reference
+
+| Your visualization | Pattern |
+|---|---|
+| Title + live data that can go stale | `DashWidget` + `DashWidgetHeader` + `DashWidgetFooter` |
+| Self-describing content (icons/images) | `DashWidget` only — no header |
+| Floating indicator on page | No `DashWidget` — own backdrop-filter |
+| Ambient (clock, large temperature) | No `DashWidget` — bare element |
+
+### --dash-* CSS variables
+
+Set automatically by `dash-base.css`. Override `--dash-tint-r/g/b` on the page wrapper for per-page glass tinting.
+
+| Variable | Value | Description |
+|---|---|---|
+| `--dash-text-primary` | `rgba(255,255,255,0.85)` | Primary text |
+| `--dash-text-secondary` | `rgba(255,255,255,0.52)` | Secondary text |
+| `--dash-text-muted` | `rgba(255,255,255,0.25)` | Muted labels, meta |
+| `--dash-divider` | `rgba(255,255,255,0.08)` | Hairline dividers |
+| `--dash-state-positive` | `#4ade80` | Green — locked, on, ok |
+| `--dash-state-info` | `#60a5fa` | Blue — informational |
+| `--dash-state-warning` | `#fbbf24` | Yellow — warning |
+| `--dash-state-critical` | `#f87171` | Red — error, unlocked, critical |
+| `--dash-radius` | `11px` | Widget corner radius |
+| `--dash-padding-lg` | `16px` | Inner padding (glance widgets) |
+| `--dash-gap` | `8px` | Header/footer ↔ content margin |
 
 ### hubble-ui components
 

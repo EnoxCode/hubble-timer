@@ -17,9 +17,6 @@ function computeDisplayMs(timer: TimerState, now: number): number {
     timer.status === 'running'
       ? timer.elapsed + (now - (timer.startedAt ?? now))
       : timer.elapsed;
-  if (timer.mode === 'countdown' && timer.duration != null) {
-    return Math.max(0, timer.duration - totalElapsed);
-  }
   return totalElapsed;
 }
 
@@ -27,15 +24,18 @@ interface StopwatchConfig {
   slug: string;
   title: string;
   size: 's' | 'm' | 'l' | 'xl';
-  doneExpand: boolean;
-  doneFlash: boolean;
+  showMilliseconds: boolean;
 }
 
-function formatTime(ms: number): string {
+function formatTime(ms: number): { main: string; subsec: string } {
   const totalSec = Math.floor(ms / 1000);
-  const m = Math.floor(totalSec / 60).toString().padStart(2, '0');
-  const s = (totalSec % 60).toString().padStart(2, '0');
-  return `${m}:${s}`;
+  const m = Math.floor(totalSec / 60);
+  const s = totalSec % 60;
+  const centiseconds = Math.floor((ms % 1000) / 10);
+  return {
+    main: `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`,
+    subsec: `.${centiseconds.toString().padStart(2, '0')}`,
+  };
 }
 
 export default function StopwatchViz() {
@@ -47,15 +47,16 @@ export default function StopwatchViz() {
   const timer: TimerState | null = allStates?.[config.slug] ?? null;
   timerRef.current = timer;
 
-  // Tick every second while running so the display updates client-side
+  const showMs = config.showMilliseconds ?? false;
+
   const [, setTick] = useState(0);
   useEffect(() => {
     if (timer?.status !== 'running') return;
-    const id = setInterval(() => setTick((n) => n + 1), 1000);
+    const interval = showMs ? 50 : 1000;
+    const id = setInterval(() => setTick((n) => n + 1), interval);
     return () => clearInterval(id);
-  }, [timer?.status]);
+  }, [timer?.status, showMs]);
 
-  // Hardware buttons
   useEffect(() => {
     const unsubToggle = sdk.onButton('button1', async () => {
       const action = timerRef.current?.status === 'running' ? 'pause' : 'resume';
@@ -75,49 +76,48 @@ export default function StopwatchViz() {
     return () => { unsubToggle(); unsubReset(); };
   }, [sdk, config.slug]);
 
-  // Done expand behavior
-  useEffect(() => {
-    if (timer?.status === 'done' && config.doneExpand) {
-      sdk.requestAcknowledge();
-    }
-  }, [timer?.status, config.doneExpand, sdk]);
-
   // ── Derived display values ─────────────────────────────
-  const status = timer?.status ?? 'idle';
+  const state = timer?.status ?? 'idle';
   const label = timer?.label ?? config.title;
   const size = config.size ?? 'm';
-  const isIdle = status === 'idle';
-  const isPaused = status === 'paused';
-  const isDone = status === 'done';
-  const doFlash = isDone && config.doneFlash;
+  const isXl = size === 'xl';
+  const isIdle = state === 'idle';
 
-  let timeText = '--:--';
+  let timeMain = '--:--';
+  let timeMs = '.00';
   if (!isIdle && timer) {
-    timeText = formatTime(computeDisplayMs(timer, Date.now()));
+    const ms = computeDisplayMs(timer, Date.now());
+    const formatted = formatTime(ms);
+    timeMain = formatted.main;
+    timeMs = formatted.subsec;
   }
 
-  const containerClass = [
-    'stopwatch',
-    `stopwatch--${size}`,
-    isPaused ? 'stopwatch--paused' : '',
-    doFlash ? 'stopwatch--flash' : '',
-  ].filter(Boolean).join(' ');
+  const stateLabel = isIdle ? 'WAITING' : state === 'paused' ? 'PAUSED' : 'ELAPSED';
+  const showShell = !isXl;
 
   return (
-    <div className={containerClass}>
-      {!isIdle && (
-        <span className="stopwatch__label">{label}</span>
+    <div
+      className={`timer-stopwatch${showShell ? ' dash-glass dash-widget' : ''}`}
+      data-state={state}
+      data-size={size}
+    >
+      {showShell && label && (
+        <div className="dash-widget-header">
+          <span className="t-label">{label}</span>
+        </div>
       )}
-      <span className={`stopwatch__time${isIdle ? ' stopwatch__time--faded' : ''}`}>
-        {timeText}
-      </span>
-      <span className={[
-        'stopwatch__sublabel',
-        isIdle ? 'stopwatch__sublabel--waiting' : '',
-        isPaused ? 'stopwatch__sublabel--paused' : '',
-      ].filter(Boolean).join(' ')}>
-        {isIdle ? 'WAITING' : isPaused ? 'PAUSED' : 'ELAPSED'}
-      </span>
+
+      <div className="timer-sw-display">
+        <div className="timer-sw-time">
+          <span className="timer-time">{timeMain}</span>
+          {showMs && <span className="timer-sw-ms">{timeMs}</span>}
+        </div>
+        <div className="timer-state-label">{stateLabel}</div>
+      </div>
+
+      {!showShell && label && (
+        <div className="timer-ambient-label t-label">{label}</div>
+      )}
     </div>
   );
 }
