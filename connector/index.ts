@@ -93,7 +93,10 @@ export default function connector(sdk: ServerSdk) {
 
   // ── API handler ──────────────────────────────────────────────────
   sdk.onApiCall(async ({ action, body }) => {
-    const { slug, duration, label } = body as { slug?: string; duration?: number; label?: string };
+    // Button presses arrive with { config, payload }; direct API calls send flat body
+    const raw = body as Record<string, unknown>;
+    const flat = raw.config ? { ...(raw.config as Record<string, unknown>), ...(raw.payload as Record<string, unknown> ?? {}) } : raw;
+    const { slug, duration, label } = flat as { slug?: string; duration?: number; label?: string };
     if (!slug) return { error: 'Missing slug' };
 
     switch (action) {
@@ -123,6 +126,24 @@ export default function connector(sdk: ServerSdk) {
         if (states[slug].mode === 'countdown' && states[slug].duration != null) {
           const remaining = states[slug].duration! - states[slug].elapsed;
           armDoneTimeout(slug, remaining);
+        }
+        persist();
+        emitAll();
+        return { ok: true };
+      }
+      case 'toggle': {
+        const state = getOrCreate(slug);
+        if (state.status === 'running') {
+          clearDoneTimeout(slug);
+          states[slug] = pauseTimer(state, Date.now());
+        } else if (state.status === 'paused') {
+          states[slug] = resumeTimer(state, Date.now());
+          if (states[slug].mode === 'countdown' && states[slug].duration != null) {
+            const remaining = states[slug].duration! - states[slug].elapsed;
+            armDoneTimeout(slug, remaining);
+          }
+        } else {
+          return { error: 'Timer not running or paused' };
         }
         persist();
         emitAll();

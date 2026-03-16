@@ -1,5 +1,5 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { useConnectorData, useWidgetConfig, useHubbleSDK } from '@hubble/sdk';
+import React, { useEffect, useState } from 'react';
+import { useConnectorData, useWidgetConfig } from '@hubble/sdk';
 import './style.css';
 
 interface TimerState {
@@ -41,11 +41,8 @@ function formatTime(ms: number): { main: string; subsec: string } {
 export default function StopwatchViz() {
   const allStates = useConnectorData<Record<string, TimerState>>('hubble-timer', 'hubble-timer:state');
   const config = useWidgetConfig<StopwatchConfig>();
-  const sdk = useHubbleSDK();
-  const timerRef = useRef<TimerState | null>(null);
 
   const timer: TimerState | null = allStates?.[config.slug] ?? null;
-  timerRef.current = timer;
 
   const showMs = config.showMilliseconds ?? false;
 
@@ -56,25 +53,6 @@ export default function StopwatchViz() {
     const id = setInterval(() => setTick((n) => n + 1), interval);
     return () => clearInterval(id);
   }, [timer?.status, showMs]);
-
-  useEffect(() => {
-    const unsubToggle = sdk.onButton('button1', async () => {
-      const action = timerRef.current?.status === 'running' ? 'pause' : 'resume';
-      await fetch(`/api/module/hubble-timer/api/${action}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ slug: config.slug }),
-      });
-    });
-    const unsubReset = sdk.onButton('button2', async () => {
-      await fetch('/api/module/hubble-timer/api/reset', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ slug: config.slug }),
-      });
-    });
-    return () => { unsubToggle(); unsubReset(); };
-  }, [sdk, config.slug]);
 
   // ── Derived display values ─────────────────────────────
   const state = timer?.status ?? 'idle';

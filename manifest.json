@@ -12,6 +12,7 @@
       "name": "start",
       "method": "POST",
       "path": "/start",
+
       "description": "Start or restart a timer",
       "body": {
         "type": "object",
@@ -38,6 +39,7 @@
       "name": "pause",
       "method": "POST",
       "path": "/pause",
+
       "description": "Pause a running timer",
       "body": {
         "type": "object",
@@ -56,6 +58,7 @@
       "name": "resume",
       "method": "POST",
       "path": "/resume",
+
       "description": "Resume a paused timer",
       "body": {
         "type": "object",
@@ -74,6 +77,7 @@
       "name": "reset",
       "method": "POST",
       "path": "/reset",
+
       "description": "Reset a timer to idle",
       "body": {
         "type": "object",

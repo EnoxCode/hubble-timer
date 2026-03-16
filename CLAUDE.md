@@ -86,7 +86,7 @@ vi.mock('@hubble/sdk', () => ({
   useConnectorData: vi.fn(() => null),
   useWidgetConfig: vi.fn(() => ({})),
   useWidgetState: vi.fn((init) => [init, vi.fn()]),
-  useHubbleSDK: vi.fn(() => ({ onButton: vi.fn(() => vi.fn()) })),
+  useHubbleSDK: vi.fn(() => ({ onButton: vi.fn(() => vi.fn()), callApi: vi.fn() })),
 }));
 ```
 
@@ -280,9 +280,12 @@ const config = useWidgetConfig<{ title?: string }>();
 // Per-widget-instance state
 const [state, setState] = useWidgetState({ count: 0 });
 
-// Raw SDK for buttons, presentation modes
+// Raw SDK for buttons, presentation modes, API calls
 const sdk = useHubbleSDK();
-useEffect(() => sdk.onButton('button1', () => doSomething()), [sdk]);
+useEffect(() => sdk.onButton('button1', (action) => doSomething(action)), [sdk]);
+
+// Call a module API endpoint (authenticated)
+await sdk.callApi('start', { slug: 'timer-1' });
 ```
 
 ---
@@ -360,10 +363,14 @@ sdk.log.error("API request failed");  // also writes to error_logs DB
 "hardwareButtons": { "button1": "play", "button2": "pause" }
 ```
 
+**Hybrid modules (with connector):** Button logic goes in the connector's `onApiCall` handler. Hubble calls it server-side automatically. Use `onButton` only for optional client-side UI reactions (animations, sounds).
+
+**Visualization-only modules:** `onButton` is the primary handler for all button logic.
+
 ```tsx
 const sdk = useHubbleSDK();
 useEffect(() => {
-  const unsub = sdk.onButton('button1', () => handlePlay());
+  const unsub = sdk.onButton('button1', (action) => handleAction(action));
   return unsub;
 }, [sdk]);
 ```
