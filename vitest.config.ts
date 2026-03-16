@@ -1,12 +1,10 @@
-import { fileURLToPath } from 'url';
 import { defineConfig } from 'vitest/config';
-
-const __dirname = fileURLToPath(new URL('.', import.meta.url));
+import path from 'path';
 
 export default defineConfig({
   resolve: {
     alias: {
-      '@hubble/sdk': `${__dirname}hubble-sdk.d.ts`,
+      '@hubble/sdk': path.resolve(__dirname, '__mocks__/@hubble/sdk.ts'),
     },
   },
   test: {
