@@ -1,0 +1,180 @@
+<h2>Alternative: Ambient Glow</h2>
+<p class="subtitle">The entire card IS the timer — its background color shifts from deep green to burning red as time runs out. No ring, no bar. The card's glow tells you the state from across the kitchen.</p>
+
+<div class="section" style="margin-bottom: 8px;">
+  <h3 style="margin-bottom:16px;">Countdown — Ambient Glow</h3>
+  <div style="display:flex; gap:16px; flex-wrap:wrap; justify-content:center; align-items:flex-end;">
+
+    <!-- No timer set -->
+    <div style="display:flex; flex-direction:column; align-items:center; gap:6px;">
+      <div style="font-size:10px; color:#555; letter-spacing:1px; text-transform:uppercase;">No timer set</div>
+      <div style="
+        width:150px; height:160px; border-radius:16px;
+        background: #111;
+        border: 1px solid #222;
+        display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px;
+      ">
+        <div style="font-size:38px; font-weight:800; color:#2a2a2a; font-family:monospace; letter-spacing:3px;">--:--</div>
+        <div style="font-size:9px; color:#2a2a2a; letter-spacing:2px; text-transform:uppercase;">WAITING</div>
+      </div>
+    </div>
+
+    <!-- Plenty of time - deep green glow -->
+    <div style="display:flex; flex-direction:column; align-items:center; gap:6px;">
+      <div style="font-size:10px; color:#555; letter-spacing:1px; text-transform:uppercase;">Lots of time</div>
+      <div style="
+        width:150px; height:160px; border-radius:16px;
+        background: radial-gradient(ellipse at center, #0d3320 0%, #071a10 100%);
+        border: 1px solid #1a5c35;
+        box-shadow: 0 0 24px #0a4a2288, inset 0 0 30px #0a2a1844;
+        display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px;
+      ">
+        <div style="font-size:10px; letter-spacing:3px; color:#2d8c55; text-transform:uppercase; margin-bottom:4px;">Pizza</div>
+        <div style="font-size:38px; font-weight:800; color:#fff; font-family:monospace; letter-spacing:3px; text-shadow: 0 0 20px #27ae6066;">18:30</div>
+        <div style="font-size:9px; color:#2d8c55; letter-spacing:2px; text-transform:uppercase;">REMAINING</div>
+      </div>
+    </div>
+
+    <!-- Mid - amber -->
+    <div style="display:flex; flex-direction:column; align-items:center; gap:6px;">
+      <div style="font-size:10px; color:#555; letter-spacing:1px; text-transform:uppercase;">Getting close</div>
+      <div style="
+        width:150px; height:160px; border-radius:16px;
+        background: radial-gradient(ellipse at center, #2e1a00 0%, #1a0f00 100%);
+        border: 1px solid #7a4a00;
+        box-shadow: 0 0 24px #7a4a0066, inset 0 0 30px #4a2a0033;
+        display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px;
+      ">
+        <div style="font-size:10px; letter-spacing:3px; color:#e67e22; text-transform:uppercase; margin-bottom:4px;">Pizza</div>
+        <div style="font-size:38px; font-weight:800; color:#fff; font-family:monospace; letter-spacing:3px; text-shadow: 0 0 20px #e67e2266;">06:15</div>
+        <div style="font-size:9px; color:#e67e22; letter-spacing:2px; text-transform:uppercase;">REMAINING</div>
+      </div>
+    </div>
+
+    <!-- Under 5 min - burning red -->
+    <div style="display:flex; flex-direction:column; align-items:center; gap:6px;">
+      <div style="font-size:10px; color:#555; letter-spacing:1px; text-transform:uppercase;">&lt; 5 min</div>
+      <div style="
+        width:150px; height:160px; border-radius:16px;
+        background: radial-gradient(ellipse at center, #3a0a0a 0%, #1e0505 100%);
+        border: 1px solid #8b1a1a;
+        box-shadow: 0 0 32px #c0392b88, inset 0 0 30px #8b0a0a44;
+        display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px;
+      ">
+        <div style="font-size:10px; letter-spacing:3px; color:#e74c3c; text-transform:uppercase; margin-bottom:4px;">Pizza</div>
+        <div style="font-size:38px; font-weight:800; color:#fff; font-family:monospace; letter-spacing:3px; text-shadow: 0 0 20px #e74c3c99;">02:48</div>
+        <div style="font-size:9px; color:#e74c3c; letter-spacing:2px; text-transform:uppercase;">REMAINING</div>
+      </div>
+    </div>
+
+    <!-- Paused -->
+    <div style="display:flex; flex-direction:column; align-items:center; gap:6px;">
+      <div style="font-size:10px; color:#555; letter-spacing:1px; text-transform:uppercase;">Paused</div>
+      <div style="
+        width:150px; height:160px; border-radius:16px;
+        background: radial-gradient(ellipse at center, #1a1500 0%, #0e0d00 100%);
+        border: 1px solid #4a4200;
+        box-shadow: 0 0 16px #55500033;
+        display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px;
+      ">
+        <div style="font-size:10px; letter-spacing:3px; color:#888; text-transform:uppercase; margin-bottom:4px;">Pizza</div>
+        <div style="font-size:38px; font-weight:800; color:#888; font-family:monospace; letter-spacing:3px;">08:45</div>
+        <div style="font-size:9px; color:#e67e22; letter-spacing:2px; text-transform:uppercase;">PAUSED</div>
+      </div>
+    </div>
+
+    <!-- Done -->
+    <div style="display:flex; flex-direction:column; align-items:center; gap:6px;">
+      <div style="font-size:10px; color:#555; letter-spacing:1px; text-transform:uppercase;">Done</div>
+      <div style="
+        width:150px; height:160px; border-radius:16px;
+        background: radial-gradient(ellipse at center, #4a0000 0%, #280000 100%);
+        border: 1px solid #cc0000;
+        box-shadow: 0 0 40px #cc000099, inset 0 0 40px #8b000055;
+        display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px;
+      ">
+        <div style="font-size:10px; letter-spacing:3px; color:#ff4444; text-transform:uppercase; margin-bottom:4px;">Pizza</div>
+        <div style="font-size:38px; font-weight:800; color:#ff4444; font-family:monospace; letter-spacing:3px; text-shadow: 0 0 30px #ff0000;">00:00</div>
+        <div style="font-size:9px; color:#ff4444; letter-spacing:2px; text-transform:uppercase;">DONE</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="section" style="margin-top:32px;">
+  <h3 style="margin-bottom:16px;">Stopwatch — Ambient Glow</h3>
+  <div style="display:flex; gap:16px; flex-wrap:wrap; justify-content:center; align-items:flex-end;">
+
+    <!-- No timer set -->
+    <div style="display:flex; flex-direction:column; align-items:center; gap:6px;">
+      <div style="font-size:10px; color:#555; letter-spacing:1px; text-transform:uppercase;">No timer set</div>
+      <div style="
+        width:150px; height:160px; border-radius:16px;
+        background: #111; border: 1px solid #222;
+        display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px;
+      ">
+        <div style="font-size:38px; font-weight:800; color:#2a2a2a; font-family:monospace; letter-spacing:3px;">--:--</div>
+        <div style="font-size:9px; color:#2a2a2a; letter-spacing:2px; text-transform:uppercase;">WAITING</div>
+      </div>
+    </div>
+
+    <!-- Running - cool blue (grows warmer over time) -->
+    <div style="display:flex; flex-direction:column; align-items:center; gap:6px;">
+      <div style="font-size:10px; color:#555; letter-spacing:1px; text-transform:uppercase;">Running (early)</div>
+      <div style="
+        width:150px; height:160px; border-radius:16px;
+        background: radial-gradient(ellipse at center, #0a1a2e 0%, #050d1a 100%);
+        border: 1px solid #1a3a6e;
+        box-shadow: 0 0 20px #1a4a9944, inset 0 0 30px #0a1a3a33;
+        display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px;
+      ">
+        <div style="font-size:10px; letter-spacing:3px; color:#4a90d9; text-transform:uppercase; margin-bottom:4px;">Soup</div>
+        <div style="font-size:38px; font-weight:800; color:#fff; font-family:monospace; letter-spacing:3px; text-shadow: 0 0 20px #4a90d966;">04:22</div>
+        <div style="font-size:9px; color:#4a90d9; letter-spacing:2px; text-transform:uppercase;">ELAPSED</div>
+      </div>
+    </div>
+
+    <!-- Running - warm (longer running) -->
+    <div style="display:flex; flex-direction:column; align-items:center; gap:6px;">
+      <div style="font-size:10px; color:#555; letter-spacing:1px; text-transform:uppercase;">Running (long)</div>
+      <div style="
+        width:150px; height:160px; border-radius:16px;
+        background: radial-gradient(ellipse at center, #2e1a00 0%, #1a0f00 100%);
+        border: 1px solid #7a4a00;
+        box-shadow: 0 0 24px #7a4a0055, inset 0 0 30px #4a2a0022;
+        display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px;
+      ">
+        <div style="font-size:10px; letter-spacing:3px; color:#e67e22; text-transform:uppercase; margin-bottom:4px;">Soup</div>
+        <div style="font-size:38px; font-weight:800; color:#fff; font-family:monospace; letter-spacing:3px; text-shadow: 0 0 20px #e67e2255;">38:11</div>
+        <div style="font-size:9px; color:#e67e22; letter-spacing:2px; text-transform:uppercase;">ELAPSED</div>
+      </div>
+    </div>
+
+    <!-- Paused -->
+    <div style="display:flex; flex-direction:column; align-items:center; gap:6px;">
+      <div style="font-size:10px; color:#555; letter-spacing:1px; text-transform:uppercase;">Paused</div>
+      <div style="
+        width:150px; height:160px; border-radius:16px;
+        background: radial-gradient(ellipse at center, #0e0e14 0%, #080810 100%);
+        border: 1px solid #2a2a44;
+        box-shadow: 0 0 16px #2a2a4433;
+        display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px;
+      ">
+        <div style="font-size:10px; letter-spacing:3px; color:#666; text-transform:uppercase; margin-bottom:4px;">Soup</div>
+        <div style="font-size:38px; font-weight:800; color:#888; font-family:monospace; letter-spacing:3px;">12:03</div>
+        <div style="font-size:9px; color:#e67e22; letter-spacing:2px; text-transform:uppercase;">PAUSED</div>
+      </div>
+    </div>
+
+  </div>
+  <p class="subtitle" style="margin-top:16px; text-align:center;">Stopwatch glow shifts from cool blue → warm amber as time accumulates — gives a sense of "how long has this been going"</p>
+</div>
+
+<div style="margin-top:32px; padding:16px; background:#111; border-radius:12px; border:1px solid #222;">
+  <p class="label" style="margin-bottom:8px;">Design principle</p>
+  <p style="color:#888; font-size:13px; line-height:1.6;">
+    The card itself is the indicator. No ring to parse, no progress bar to read — just a glance at the color temperature tells you the state. On a dark kitchen dashboard, the glow reads from across the room.
+    A row of timers becomes a row of colored lights: green, green, orange, <span style="color:#e74c3c">red</span>.
+  </p>
+</div>

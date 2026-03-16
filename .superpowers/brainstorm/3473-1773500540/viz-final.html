@@ -1,0 +1,86 @@
+<h2>Final Visualization Styles</h2>
+<p class="subtitle">Confirming the two visualization designs</p>
+
+<div class="split">
+
+  <div class="mockup">
+    <div class="mockup-header">Countdown — Circular (green → red)</div>
+    <div class="mockup-body" style="background:#0f0f0f; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:32px; gap:20px;">
+
+      <div style="display:flex; gap:32px; align-items:center;">
+        <!-- Plenty of time - green -->
+        <div style="display:flex; flex-direction:column; align-items:center; gap:8px;">
+          <div style="font-size:10px; color:#666; letter-spacing:1px;">PIZZA — 8:45 left</div>
+          <svg width="100" height="100" viewBox="0 0 100 100">
+            <circle cx="50" cy="50" r="42" fill="none" stroke="#1a2a1a" stroke-width="9"/>
+            <circle cx="50" cy="50" r="42" fill="none" stroke="#27ae60" stroke-width="9"
+              stroke-dasharray="264 330" stroke-dashoffset="0" stroke-linecap="round"
+              transform="rotate(-90 50 50)"/>
+            <text x="50" y="47" text-anchor="middle" fill="#fff" font-size="17" font-weight="700" font-family="monospace">08:45</text>
+            <text x="50" y="62" text-anchor="middle" fill="#555" font-size="8" letter-spacing="1">REMAINING</text>
+          </svg>
+        </div>
+
+        <!-- Last 5 min - red -->
+        <div style="display:flex; flex-direction:column; align-items:center; gap:8px;">
+          <div style="font-size:10px; color:#666; letter-spacing:1px;">PIZZA — 3:12 left</div>
+          <svg width="100" height="100" viewBox="0 0 100 100">
+            <circle cx="50" cy="50" r="42" fill="none" stroke="#2a1a1a" stroke-width="9"/>
+            <circle cx="50" cy="50" r="42" fill="none" stroke="#e74c3c" stroke-width="9"
+              stroke-dasharray="82 330" stroke-dashoffset="0" stroke-linecap="round"
+              transform="rotate(-90 50 50)"/>
+            <text x="50" y="47" text-anchor="middle" fill="#fff" font-size="17" font-weight="700" font-family="monospace">03:12</text>
+            <text x="50" y="62" text-anchor="middle" fill="#555" font-size="8" letter-spacing="1">REMAINING</text>
+          </svg>
+        </div>
+
+        <!-- Done - pulsing red ring empty -->
+        <div style="display:flex; flex-direction:column; align-items:center; gap:8px;">
+          <div style="font-size:10px; color:#666; letter-spacing:1px;">PIZZA — done!</div>
+          <svg width="100" height="100" viewBox="0 0 100 100">
+            <circle cx="50" cy="50" r="42" fill="none" stroke="#e74c3c" stroke-width="9" opacity="0.3"/>
+            <text x="50" y="47" text-anchor="middle" fill="#e74c3c" font-size="17" font-weight="700" font-family="monospace">00:00</text>
+            <text x="50" y="62" text-anchor="middle" fill="#e74c3c" font-size="8" letter-spacing="1">DONE</text>
+          </svg>
+        </div>
+      </div>
+
+      <div style="font-size:11px; color:#555; text-align:center; max-width:280px; line-height:1.5;">
+        Ring drains as time runs out. Green until 5 min left, then switches to red. No buttons — controlled by hardware buttons.
+      </div>
+    </div>
+  </div>
+
+  <div class="mockup">
+    <div class="mockup-header">Stopwatch — Digital</div>
+    <div class="mockup-body" style="background:#0f0f0f; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:32px; gap:20px;">
+
+      <div style="display:flex; gap:32px; align-items:center;">
+        <!-- Running -->
+        <div style="display:flex; flex-direction:column; align-items:center; gap:8px;">
+          <div style="font-size:10px; color:#666; letter-spacing:1px;">SOUP — running</div>
+          <div style="display:flex; flex-direction:column; align-items:center; background:#111; border-radius:12px; padding:20px 24px;">
+            <div style="font-size:11px; letter-spacing:2px; color:#888; text-transform:uppercase; margin-bottom:6px;">SOUP</div>
+            <div style="font-size:52px; font-weight:700; color:#fff; font-family:monospace; letter-spacing:3px; line-height:1;">12:03</div>
+            <div style="font-size:10px; color:#555; margin-top:4px; letter-spacing:1px;">ELAPSED</div>
+          </div>
+        </div>
+
+        <!-- Paused -->
+        <div style="display:flex; flex-direction:column; align-items:center; gap:8px;">
+          <div style="font-size:10px; color:#666; letter-spacing:1px;">SOUP — paused</div>
+          <div style="display:flex; flex-direction:column; align-items:center; background:#111; border-radius:12px; padding:20px 24px;">
+            <div style="font-size:11px; letter-spacing:2px; color:#888; text-transform:uppercase; margin-bottom:6px;">SOUP</div>
+            <div style="font-size:52px; font-weight:700; color:#888; font-family:monospace; letter-spacing:3px; line-height:1;">12:03</div>
+            <div style="font-size:10px; color:#e67e22; margin-top:4px; letter-spacing:1px;">PAUSED</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="font-size:11px; color:#555; text-align:center; max-width:280px; line-height:1.5;">
+        Clean digital elapsed time. Dims when paused. No upper limit. No buttons — controlled by hardware buttons.
+      </div>
+    </div>
+  </div>
+
+</div>

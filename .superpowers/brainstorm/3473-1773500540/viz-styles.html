@@ -1,0 +1,102 @@
+<h2>Visualization Styles</h2>
+<p class="subtitle">Two visualization types to build — what should each look like? Select your preferred style for each.</p>
+
+<div class="section">
+  <h3 style="margin-bottom: 16px;">Countdown Timer</h3>
+  <div class="cards">
+
+    <div class="card" data-choice="countdown-digital" onclick="toggleSelect(this)">
+      <div class="card-image" style="background:#0f0f0f; padding:24px; display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:200px; border-radius:8px 8px 0 0;">
+        <div style="font-size:11px; letter-spacing:2px; color:#888; text-transform:uppercase; margin-bottom:8px;">PIZZA</div>
+        <div style="font-size:64px; font-weight:700; color:#fff; font-family:monospace; letter-spacing:4px; line-height:1;">08:45</div>
+        <div style="margin-top:16px; display:flex; gap:8px;">
+          <div style="background:#333; border-radius:50%; width:28px; height:28px; display:flex; align-items:center; justify-content:center; color:#fff; font-size:12px;">⏸</div>
+          <div style="background:#e74c3c; border-radius:50%; width:28px; height:28px; display:flex; align-items:center; justify-content:center; color:#fff; font-size:12px;">■</div>
+        </div>
+        <div style="margin-top:12px; width:80%; height:4px; background:#222; border-radius:2px;">
+          <div style="width:72%; height:100%; background:#e74c3c; border-radius:2px;"></div>
+        </div>
+      </div>
+      <div class="card-body">
+        <h3>Digital Countdown</h3>
+        <p>Large bold clock-style digits. Progress bar shows time remaining. Minimal, reads fast from across the kitchen.</p>
+      </div>
+    </div>
+
+    <div class="card" data-choice="countdown-analog" onclick="toggleSelect(this)">
+      <div class="card-image" style="background:#0f0f0f; padding:24px; display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:200px; border-radius:8px 8px 0 0;">
+        <div style="font-size:11px; letter-spacing:2px; color:#888; text-transform:uppercase; margin-bottom:8px;">PIZZA</div>
+        <svg width="120" height="120" viewBox="0 0 120 120">
+          <!-- background circle -->
+          <circle cx="60" cy="60" r="52" fill="none" stroke="#222" stroke-width="10"/>
+          <!-- progress arc (72% remaining = ~259 degrees) -->
+          <circle cx="60" cy="60" r="52" fill="none" stroke="#e74c3c" stroke-width="10"
+            stroke-dasharray="326.7 453" stroke-dashoffset="81.7" stroke-linecap="round"
+            transform="rotate(-90 60 60)"/>
+          <!-- center text -->
+          <text x="60" y="56" text-anchor="middle" fill="#fff" font-size="20" font-weight="700" font-family="monospace">08:45</text>
+          <text x="60" y="74" text-anchor="middle" fill="#666" font-size="9" letter-spacing="1">REMAINING</text>
+        </svg>
+        <div style="margin-top:8px; display:flex; gap:8px;">
+          <div style="background:#333; border-radius:50%; width:28px; height:28px; display:flex; align-items:center; justify-content:center; color:#fff; font-size:12px;">⏸</div>
+          <div style="background:#e74c3c; border-radius:50%; width:28px; height:28px; display:flex; align-items:center; justify-content:center; color:#fff; font-size:12px;">■</div>
+        </div>
+      </div>
+      <div class="card-body">
+        <h3>Circular Countdown</h3>
+        <p>Ring empties as time runs out. Time displayed in center. Satisfying visual sense of "how much is left."</p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="section" style="margin-top:32px;">
+  <h3 style="margin-bottom: 16px;">Stopwatch (Count Up)</h3>
+  <div class="cards">
+
+    <div class="card" data-choice="stopwatch-digital" onclick="toggleSelect(this)">
+      <div class="card-image" style="background:#0f0f0f; padding:24px; display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:200px; border-radius:8px 8px 0 0;">
+        <div style="font-size:11px; letter-spacing:2px; color:#888; text-transform:uppercase; margin-bottom:8px;">SOUP</div>
+        <div style="font-size:64px; font-weight:700; color:#fff; font-family:monospace; letter-spacing:4px; line-height:1;">12:03</div>
+        <div style="font-size:11px; color:#888; margin-top:4px; letter-spacing:1px;">ELAPSED</div>
+        <div style="margin-top:12px; display:flex; gap:8px;">
+          <div style="background:#333; border-radius:50%; width:28px; height:28px; display:flex; align-items:center; justify-content:center; color:#fff; font-size:12px;">⏸</div>
+          <div style="background:#e74c3c; border-radius:50%; width:28px; height:28px; display:flex; align-items:center; justify-content:center; color:#fff; font-size:12px;">■</div>
+          <div style="background:#333; border-radius:50%; width:28px; height:28px; display:flex; align-items:center; justify-content:center; color:#fff; font-size:12px;">↺</div>
+        </div>
+      </div>
+      <div class="card-body">
+        <h3>Digital Stopwatch</h3>
+        <p>Counts up from 00:00. Simple elapsed time display. Reset button brings it back to zero.</p>
+      </div>
+    </div>
+
+    <div class="card" data-choice="stopwatch-spiral" onclick="toggleSelect(this)">
+      <div class="card-image" style="background:#0f0f0f; padding:24px; display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:200px; border-radius:8px 8px 0 0;">
+        <div style="font-size:11px; letter-spacing:2px; color:#888; text-transform:uppercase; margin-bottom:8px;">SOUP</div>
+        <svg width="120" height="120" viewBox="0 0 120 120">
+          <circle cx="60" cy="60" r="52" fill="none" stroke="#222" stroke-width="10"/>
+          <!-- filling up ring ~30% -->
+          <circle cx="60" cy="60" r="52" fill="none" stroke="#27ae60" stroke-width="10"
+            stroke-dasharray="98 328" stroke-dashoffset="0" stroke-linecap="round"
+            transform="rotate(-90 60 60)"/>
+          <text x="60" y="56" text-anchor="middle" fill="#fff" font-size="20" font-weight="700" font-family="monospace">12:03</text>
+          <text x="60" y="74" text-anchor="middle" fill="#666" font-size="9" letter-spacing="1">ELAPSED</text>
+        </svg>
+        <div style="margin-top:8px; display:flex; gap:8px;">
+          <div style="background:#333; border-radius:50%; width:28px; height:28px; display:flex; align-items:center; justify-content:center; color:#fff; font-size:12px;">⏸</div>
+          <div style="background:#e74c3c; border-radius:50%; width:28px; height:28px; display:flex; align-items:center; justify-content:center; color:#fff; font-size:12px;">■</div>
+          <div style="background:#333; border-radius:50%; width:28px; height:28px; display:flex; align-items:center; justify-content:center; color:#fff; font-size:12px;">↺</div>
+        </div>
+      </div>
+      <div class="card-body">
+        <h3>Circular Stopwatch</h3>
+        <p>Ring fills as time passes (one full lap = configurable interval, e.g. 15 min). Gives a sense of pace.</p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<p class="subtitle" style="margin-top:24px;">You can select one or multiple. Click to highlight your preference(s).</p>
