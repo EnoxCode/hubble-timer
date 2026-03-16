@@ -1,6 +1,6 @@
 {
   "name": "hubble-module-hubble-timer",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "A timer that will be used for cooking timer, can be counting up or counting down.",
   "private": true,
   "keywords": [
