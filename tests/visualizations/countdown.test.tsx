@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import React from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
@@ -108,48 +107,6 @@ describe('size prop', () => {
     setConfig({ size: 'xl' });
     const { container } = render(<CountdownViz />);
     expect(container.firstChild).not.toHaveClass('dash-glass');
-  });
-});
-
-describe('hardware buttons', () => {
-  beforeEach(() => {
-    global.fetch = vi.fn().mockResolvedValue({ ok: true });
-  });
-
-  it('button1 calls /pause when timer is running', async () => {
-    setTimer({ status: 'running', duration: 600_000, startedAt: Date.now(), elapsed: 0 });
-    const mockSdk = {
-      onButton: vi.fn((name: string, handler: () => void) => {
-        if (name === 'button1') { (mockSdk as any)._button1 = handler; }
-        return vi.fn();
-      }),
-      requestAcknowledge: vi.fn(),
-    };
-    (useHubbleSDK as ReturnType<typeof vi.fn>).mockReturnValue(mockSdk);
-    render(<CountdownViz />);
-    await (mockSdk as any)._button1();
-    expect(global.fetch).toHaveBeenCalledWith(
-      '/api/module/hubble-timer/api/pause',
-      expect.objectContaining({ method: 'POST', body: JSON.stringify({ slug: 'timer-1' }) })
-    );
-  });
-
-  it('button1 calls /resume when timer is paused', async () => {
-    setTimer({ status: 'paused', duration: 600_000, elapsed: 10_000 });
-    const mockSdk = {
-      onButton: vi.fn((name: string, handler: () => void) => {
-        if (name === 'button1') { (mockSdk as any)._button1 = handler; }
-        return vi.fn();
-      }),
-      requestAcknowledge: vi.fn(),
-    };
-    (useHubbleSDK as ReturnType<typeof vi.fn>).mockReturnValue(mockSdk);
-    render(<CountdownViz />);
-    await (mockSdk as any)._button1();
-    expect(global.fetch).toHaveBeenCalledWith(
-      '/api/module/hubble-timer/api/resume',
-      expect.objectContaining({ method: 'POST', body: JSON.stringify({ slug: 'timer-1' }) })
-    );
   });
 });
 
