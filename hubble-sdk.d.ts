@@ -273,8 +273,8 @@ export interface ClientSdk {
   /** Register a hardware button handler. Returns unsubscribe function. */
   onButton(buttonId: string, callback: (action: string, payload?: unknown) => void): () => void;
 
-  /** Call a module API endpoint (authenticated). Action is the endpoint path without leading slash. */
-  callApi(action: string, body?: Record<string, unknown>): Promise<unknown>;
+  /** Call a module API endpoint (authenticated). Action is the endpoint path without leading slash. Optionally target another module's API. */
+  callApi(action: string, body?: Record<string, unknown>, targetModule?: string): Promise<unknown>;
 }
 
 // ─── React Hooks ──────────────────────────────────────────────────
