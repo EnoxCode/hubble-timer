@@ -93,6 +93,7 @@
       "method": "POST",
       "path": "/start-available",
       "description": "Start the first available idle timer",
+      "public": true,
       "body": {
         "type": "object",
         "required": [
