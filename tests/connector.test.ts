@@ -19,6 +19,7 @@ type MockSdk = ReturnType<typeof makeMockSdk>;
 function makeMockSdk(storedStates?: string | null) {
   return {
     emit: vi.fn(),
+    emitEvent: vi.fn(),
     onApiCall: vi.fn(),
     log: { info: vi.fn(), warn: vi.fn(), error: vi.fn() },
     notify: vi.fn(),

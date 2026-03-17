@@ -50,9 +50,12 @@ export default function connector(sdk: ServerSdk) {
   }
 
   function fireDone(slug: string) {
+    const label = states[slug]?.label ?? null;
+    const duration = states[slug]?.duration != null ? states[slug].duration / 1000 : null;
     states[slug] = markDone(states[slug]);
     persist();
     emitAll();
+    sdk.emitEvent('timer:finished', { slug, label, duration });
     fireDoneNotify(slug);
   }
 
@@ -118,6 +121,12 @@ export default function connector(sdk: ServerSdk) {
       }
       persist();
       emitAll();
+      sdk.emitEvent('timer:started', {
+        slug: availableSlug,
+        label: label ?? null,
+        mode: states[availableSlug].mode,
+        duration: duration ?? null,
+      });
       return { ok: true, slug: availableSlug };
     }
 
@@ -133,6 +142,13 @@ export default function connector(sdk: ServerSdk) {
         }
         persist();
         emitAll();
+        sdk.emitEvent('timer:started', {
+          slug,
+          label: states[slug].label ?? null,
+          mode: states[slug].mode,
+          duration: states[slug].mode === 'countdown' && states[slug].duration != null
+            ? states[slug].duration! / 1000 : null,
+        });
         return { ok: true };
       }
       case 'pause': {
@@ -142,6 +158,10 @@ export default function connector(sdk: ServerSdk) {
         states[slug] = pauseTimer(state, Date.now());
         persist();
         emitAll();
+        sdk.emitEvent('timer:paused', {
+          slug,
+          elapsed: states[slug].elapsed / 1000,
+        });
         return { ok: true };
       }
       case 'resume': {
@@ -154,6 +174,10 @@ export default function connector(sdk: ServerSdk) {
         }
         persist();
         emitAll();
+        sdk.emitEvent('timer:resumed', {
+          slug,
+          elapsed: states[slug].elapsed / 1000,
+        });
         return { ok: true };
       }
       case 'toggle': {
@@ -161,17 +185,27 @@ export default function connector(sdk: ServerSdk) {
         if (state.status === 'running') {
           clearDoneTimeout(slug);
           states[slug] = pauseTimer(state, Date.now());
+          persist();
+          emitAll();
+          sdk.emitEvent('timer:paused', {
+            slug,
+            elapsed: states[slug].elapsed / 1000,
+          });
         } else if (state.status === 'paused') {
           states[slug] = resumeTimer(state, Date.now());
           if (states[slug].mode === 'countdown' && states[slug].duration != null) {
             const remaining = states[slug].duration! - states[slug].elapsed;
             armDoneTimeout(slug, remaining);
           }
+          persist();
+          emitAll();
+          sdk.emitEvent('timer:resumed', {
+            slug,
+            elapsed: states[slug].elapsed / 1000,
+          });
         } else {
           return { error: 'Timer not running or paused' };
         }
-        persist();
-        emitAll();
         return { ok: true };
       }
       case 'reset': {
@@ -179,6 +213,7 @@ export default function connector(sdk: ServerSdk) {
         states[slug] = resetTimer(getOrCreate(slug));
         persist();
         emitAll();
+        sdk.emitEvent('timer:reset', { slug });
         return { ok: true };
       }
       default:
