@@ -1,6 +1,6 @@
 {
   "name": "hubble-module-hubble-timer",
-  "version": "1.2.0",
+  "version": "1.2.3",
   "description": "A timer that will be used for cooking timer, can be counting up or counting down.",
   "private": true,
   "keywords": [
@@ -17,15 +17,15 @@
     "test:watch": "vitest"
   },
   "devDependencies": {
-    "esbuild": "^0.24.0",
-    "@hubblehome/module-scaffolding": "*",
-    "eslint": "^9.0.0",
     "@eslint/js": "^9.0.0",
-    "typescript-eslint": "^8.0.0",
-    "vitest": "^2.0.0",
-    "@testing-library/react": "^16.0.0",
+    "@hubblehome/module-scaffolding": "file:../hubble/tools/create-hubble-module",
     "@testing-library/jest-dom": "^6.0.0",
+    "@testing-library/react": "^16.0.0",
+    "esbuild": "^0.24.0",
+    "eslint": "^9.0.0",
+    "eslint-plugin-react-hooks": "^5.0.0",
     "jsdom": "^25.0.0",
-    "eslint-plugin-react-hooks": "^5.0.0"
+    "typescript-eslint": "^8.0.0",
+    "vitest": "^2.0.0"
   }
 }

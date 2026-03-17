@@ -107,7 +107,10 @@ export default function connector(sdk: ServerSdk) {
         const state = states[s];
         return !state || state.status === 'idle';
       });
-      if (!availableSlug) return { ok: false, error: 'all-busy' };
+      if (!availableSlug) {
+        sdk.notify(`No timers available for "${label}"`, { level: 'warning', title: 'Countdown timers' });
+        return { ok: false, error: 'all-busy' };
+      }
       clearDoneTimeout(availableSlug);
       states[availableSlug] = startTimer(getOrCreate(availableSlug), { duration, label, now: Date.now() });
       if (states[availableSlug].mode === 'countdown' && states[availableSlug].duration != null) {
