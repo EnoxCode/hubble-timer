@@ -1,6 +1,6 @@
 {
   "name": "hubble-timer",
-  "version": "1.2.4",
+  "version": "1.2.5",
   "description": "A cooking timer with countdown and stopwatch modes.",
   "minAppVersion": "0.1.0",
   "type": [
