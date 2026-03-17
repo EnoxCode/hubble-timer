@@ -1,6 +1,6 @@
 {
   "name": "hubble-timer",
-  "version": "1.2.5",
+  "version": "1.2.6",
   "description": "A cooking timer with countdown and stopwatch modes.",
   "minAppVersion": "0.1.0",
   "type": [
@@ -12,42 +12,82 @@
       "name": "timer:started",
       "description": "A timer began counting",
       "payload": {
-        "slug": { "type": "string", "description": "Timer identifier (e.g. timer-1)" },
-        "label": { "type": "string", "description": "Display label for this run" },
-        "mode": { "type": "string", "enum": ["countdown", "stopwatch"], "description": "Timer mode" },
-        "duration": { "type": "number", "description": "Duration in seconds (countdown only)" }
+        "slug": {
+          "type": "string",
+          "description": "Timer identifier (e.g. timer-1)"
+        },
+        "label": {
+          "type": "string",
+          "description": "Display label for this run"
+        },
+        "mode": {
+          "type": "string",
+          "enum": [
+            "countdown",
+            "stopwatch"
+          ],
+          "description": "Timer mode"
+        },
+        "duration": {
+          "type": "number",
+          "description": "Duration in seconds (countdown only)"
+        }
       }
     },
     {
       "name": "timer:paused",
       "description": "A timer was paused",
       "payload": {
-        "slug": { "type": "string", "description": "Timer identifier" },
-        "elapsed": { "type": "number", "description": "Elapsed time in seconds" }
+        "slug": {
+          "type": "string",
+          "description": "Timer identifier"
+        },
+        "elapsed": {
+          "type": "number",
+          "description": "Elapsed time in seconds"
+        }
       }
     },
     {
       "name": "timer:resumed",
       "description": "A paused timer was resumed",
       "payload": {
-        "slug": { "type": "string", "description": "Timer identifier" },
-        "elapsed": { "type": "number", "description": "Elapsed time in seconds" }
+        "slug": {
+          "type": "string",
+          "description": "Timer identifier"
+        },
+        "elapsed": {
+          "type": "number",
+          "description": "Elapsed time in seconds"
+        }
       }
     },
     {
       "name": "timer:finished",
       "description": "A countdown completed",
       "payload": {
-        "slug": { "type": "string", "description": "Timer identifier" },
-        "label": { "type": "string", "description": "Display label" },
-        "duration": { "type": "number", "description": "Total duration in seconds" }
+        "slug": {
+          "type": "string",
+          "description": "Timer identifier"
+        },
+        "label": {
+          "type": "string",
+          "description": "Display label"
+        },
+        "duration": {
+          "type": "number",
+          "description": "Total duration in seconds"
+        }
       }
     },
     {
       "name": "timer:reset",
       "description": "A timer was reset to idle",
       "payload": {
-        "slug": { "type": "string", "description": "Timer identifier" }
+        "slug": {
+          "type": "string",
+          "description": "Timer identifier"
+        }
       }
     }
   ],
