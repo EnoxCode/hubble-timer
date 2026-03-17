@@ -1,6 +1,6 @@
 {
   "name": "hubble-timer",
-  "version": "1.2.0",
+  "version": "1.2.2",
   "description": "A cooking timer with countdown and stopwatch modes.",
   "minAppVersion": "0.1.0",
   "type": [
@@ -84,6 +84,29 @@
           "slug": {
             "type": "string",
             "description": "Widget slug to target"
+          }
+        }
+      }
+    },
+    {
+      "name": "start-available",
+      "method": "POST",
+      "path": "/start-available",
+      "description": "Start the first available idle timer",
+      "body": {
+        "type": "object",
+        "required": [
+          "duration",
+          "label"
+        ],
+        "properties": {
+          "duration": {
+            "type": "number",
+            "description": "Duration in seconds"
+          },
+          "label": {
+            "type": "string",
+            "description": "Timer display label"
           }
         }
       }

@@ -96,6 +96,28 @@ export default function connector(sdk: ServerSdk) {
     // Button presses arrive with { config, payload }; direct API calls send flat body
     const raw = body as Record<string, unknown>;
     const flat = raw.config ? { ...(raw.config as Record<string, unknown>), ...(raw.payload as Record<string, unknown> ?? {}) } : raw;
+
+    // start-available doesn't require a slug — handle before slug check
+    if (action === 'start-available') {
+      const { duration, label } = flat as { duration?: number; label?: string };
+      if (duration == null || !label) return { error: 'Missing duration or label' };
+      const configs = sdk.getWidgetConfigs() as Record<string, unknown>[];
+      const allSlugs = configs.map((c) => c['slug'] as string).filter(Boolean);
+      const availableSlug = allSlugs.find((s) => {
+        const state = states[s];
+        return !state || state.status === 'idle';
+      });
+      if (!availableSlug) return { ok: false, error: 'all-busy' };
+      clearDoneTimeout(availableSlug);
+      states[availableSlug] = startTimer(getOrCreate(availableSlug), { duration, label, now: Date.now() });
+      if (states[availableSlug].mode === 'countdown' && states[availableSlug].duration != null) {
+        armDoneTimeout(availableSlug, states[availableSlug].duration!);
+      }
+      persist();
+      emitAll();
+      return { ok: true, slug: availableSlug };
+    }
+
     const { slug, duration, label } = flat as { slug?: string; duration?: number; label?: string };
     if (!slug) return { error: 'Missing slug' };
 
