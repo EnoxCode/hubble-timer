@@ -70,13 +70,7 @@
 }
 
 /* ── Widget content centering ── */
-.timer-stopwatch.dash-widget {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.timer-stopwatch:not(.dash-widget) {
+.timer-stopwatch {
   display: flex;
   flex-direction: column;
   align-items: center;

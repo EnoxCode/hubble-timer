@@ -37,7 +37,7 @@ export default function connector(sdk: ServerSdk) {
   }
 
   function fireDoneNotify(slug: string) {
-    const configs = sdk.getWidgetConfigs() as Record<string, unknown>[];
+    const configs = sdk.getWidgetConfigs();
     const config = configs.find((c) => c['slug'] === slug);
     if (!config) {
       sdk.log.warn(`Done fired for slug "${slug}" but no widget config found`);
@@ -46,6 +46,9 @@ export default function connector(sdk: ServerSdk) {
     if (config['doneNotify'] !== false) {
       const label = (states[slug]?.label ?? config['title'] ?? slug) as string;
       sdk.notify(`${label} is done!`, { level: 'info' });
+    }
+    if (config['doneSelect'] === true) {
+      sdk.selectWidget(config.id);
     }
   }
 

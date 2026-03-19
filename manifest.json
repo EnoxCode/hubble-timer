@@ -267,6 +267,13 @@
           "description": "Flash the widget when done"
         },
         {
+          "name": "doneSelect",
+          "type": "boolean",
+          "required": false,
+          "default": false,
+          "description": "Select this widget on the dashboard when done"
+        },
+        {
           "name": "warningThreshold",
           "type": "range",
           "required": false,
@@ -345,6 +352,13 @@
           "required": false,
           "default": false,
           "description": "Flash the widget when done"
+        },
+        {
+          "name": "doneSelect",
+          "type": "boolean",
+          "required": false,
+          "default": false,
+          "description": "Select this widget on the dashboard when done"
         },
         {
           "name": "showMilliseconds",

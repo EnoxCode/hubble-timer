@@ -23,7 +23,8 @@ function makeMockSdk(storedStates?: string | null) {
     onApiCall: vi.fn(),
     log: { info: vi.fn(), warn: vi.fn(), error: vi.fn() },
     notify: vi.fn(),
-    getWidgetConfigs: vi.fn(() => [] as Record<string, unknown>[]),
+    getWidgetConfigs: vi.fn(() => [] as ({ id: number } & Record<string, unknown>)[]),
+    selectWidget: vi.fn(),
     storage: {
       get: vi.fn((key: string) => (key === 'timerStates' ? (storedStates ?? null) : null)),
       set: vi.fn(),
@@ -113,7 +114,7 @@ describe('connector: API actions', () => {
 
   it('fires done event when countdown expires', async () => {
     const sdk = makeMockSdk();
-    sdk.getWidgetConfigs.mockReturnValue([{ slug: 'timer-1', title: 'Pizza Timer', doneNotify: true }]);
+    sdk.getWidgetConfigs.mockReturnValue([{ id: 1, slug: 'timer-1', title: 'Pizza Timer', doneNotify: true }]);
     connector(sdk as any);
     await callAction(sdk, 'start', { slug: 'timer-1', duration: 10 });
     vi.advanceTimersByTime(10_000);
@@ -125,7 +126,7 @@ describe('connector: API actions', () => {
 
   it('uses API label for done notification when label is set', async () => {
     const sdk = makeMockSdk();
-    sdk.getWidgetConfigs.mockReturnValue([{ slug: 'timer-1', title: 'Pizza Timer', doneNotify: true }]);
+    sdk.getWidgetConfigs.mockReturnValue([{ id: 1, slug: 'timer-1', title: 'Pizza Timer', doneNotify: true }]);
     connector(sdk as any);
     await callAction(sdk, 'start', { slug: 'timer-1', duration: 10, label: 'Lasagna' });
     vi.advanceTimersByTime(10_000);
@@ -134,7 +135,7 @@ describe('connector: API actions', () => {
 
   it('does not notify when doneNotify is false', async () => {
     const sdk = makeMockSdk();
-    sdk.getWidgetConfigs.mockReturnValue([{ slug: 'timer-1', title: 'Pizza Timer', doneNotify: false }]);
+    sdk.getWidgetConfigs.mockReturnValue([{ id: 1, slug: 'timer-1', title: 'Pizza Timer', doneNotify: false }]);
     connector(sdk as any);
     await callAction(sdk, 'start', { slug: 'timer-1', duration: 10 });
     vi.advanceTimersByTime(10_000);

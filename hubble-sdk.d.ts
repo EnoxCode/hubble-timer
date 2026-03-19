@@ -63,6 +63,7 @@ export interface ModuleManifest {
   version: string;
   description: string;
   minAppVersion?: string;
+  minSdkVersion?: string;
   type: ('connector' | 'visualization')[];
   visualizations?: VisualizationEntry[];
   dependencies?: { name: string; minVersion: string }[];
@@ -182,6 +183,9 @@ export interface OAuthApi {
 // ─── Server SDK ───────────────────────────────────────────────────
 
 export interface ServerSdk {
+  /** The current SDK version string. Modules can read this to conditionally use features. */
+  version: string;
+
   /** Emit data to all subscribed visualizations via WebSocket. */
   emit(topic: string, data: unknown): void;
 
@@ -207,7 +211,7 @@ export interface ServerSdk {
     error(message: string): void;
   };
 
-  /** Log an error to the error_logs table for admin panel display. */
+  /** Log an error to the error_logs table for studio display. */
   logError(message: string, stack?: string): void;
 
   /** Get module config: manifest property defaults merged with stored config. */
@@ -228,8 +232,11 @@ export interface ServerSdk {
   /** Send a notification to the dashboard. */
   notify(message: string, options?: NotifyOptions): void;
 
-  /** Get the config object for every widget instance using this module. */
-  getWidgetConfigs(): Record<string, unknown>[];
+  /** Get the config object (plus `id`) for every widget instance using this module. */
+  getWidgetConfigs(): ({ id: number } & Record<string, unknown>)[];
+
+  /** Select a specific widget by its database ID, or pass null to deselect. */
+  selectWidget(widgetId: number | null): void;
 
   /** Register a handler for custom API endpoint calls declared in manifest "endpoints". */
   onApiCall(

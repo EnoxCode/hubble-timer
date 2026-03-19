@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useConnectorData, useWidgetConfig } from '@hubble/sdk';
+import { DashWidget, DashWidgetHeader } from 'hubble-dash-ui';
+import 'hubble-dash-ui/styles/dash-base.css';
 import './style.css';
 
 interface TimerState {
@@ -73,17 +75,13 @@ export default function StopwatchViz() {
   const stateLabel = isIdle ? 'WAITING' : state === 'paused' ? 'PAUSED' : 'ELAPSED';
   const showShell = !isXl;
 
-  return (
+  const inner = (
     <div
-      className={`timer-stopwatch${showShell ? ' dash-glass dash-widget' : ''}`}
+      className="timer-stopwatch"
       data-state={state}
       data-size={size}
     >
-      {showShell && label && (
-        <div className="dash-widget-header">
-          <span className="t-label">{label}</span>
-        </div>
-      )}
+      {showShell && label && <DashWidgetHeader label={label} />}
 
       <div className="timer-sw-display">
         <div className="timer-sw-time">
@@ -98,4 +96,9 @@ export default function StopwatchViz() {
       )}
     </div>
   );
+
+  if (showShell) {
+    return <DashWidget>{inner}</DashWidget>;
+  }
+  return inner;
 }

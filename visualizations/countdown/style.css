@@ -126,13 +126,7 @@
 }
 
 /* ── Widget content centering ── */
-.timer-countdown.dash-widget {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.timer-countdown:not(.dash-widget) {
+.timer-countdown {
   display: flex;
   flex-direction: column;
   align-items: center;

@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useConnectorData, useWidgetConfig, useHubbleSDK } from '@hubble/sdk';
+import { DashWidget, DashWidgetHeader } from 'hubble-dash-ui';
+import 'hubble-dash-ui/styles/dash-base.css';
 import './style.css';
 
 interface TimerState {
@@ -102,19 +104,19 @@ export default function CountdownViz() {
         : 'REMAINING';
 
   const showShell = !isXl;
+  const statusBorder = state === 'warning' || state === 'done' ? 'critical'
+    : state === 'running' ? 'positive'
+    : state === 'paused' ? 'neutral'
+    : undefined;
 
-  return (
+  const inner = (
     <div
-      className={`timer-countdown${showShell ? ' dash-glass dash-widget' : ''}`}
+      className="timer-countdown"
       data-state={state}
       data-size={size}
       data-flash={config.doneFlash && state === 'done' ? 'true' : undefined}
     >
-      {showShell && label && (
-        <div className="dash-widget-header">
-          <span className="t-label">{label}</span>
-        </div>
-      )}
+      {showShell && label && <DashWidgetHeader label={label} />}
 
       <div className="timer-ring-wrap">
         <svg width="100" height="100" viewBox="0 0 100 100" className="timer-ring-svg">
@@ -163,4 +165,9 @@ export default function CountdownViz() {
       )}
     </div>
   );
+
+  if (showShell) {
+    return <DashWidget className="timer-countdown-shell" statusBorder={statusBorder}>{inner}</DashWidget>;
+  }
+  return inner;
 }
