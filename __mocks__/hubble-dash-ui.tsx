@@ -10,25 +10,25 @@ export const DashWidgetHeader = ({ label, meta, right }: { label: string; meta?:
     right,
   );
 
-export const DashWidgetFooter = ({ label, status, updatedAt }: { label?: string; status?: string; updatedAt?: Date | number }) =>
+export const DashWidgetFooter = ({ label }: { label?: string; status?: string; updatedAt?: Date | number }) =>
   React.createElement('div', { className: 'dash-widget-footer' }, label);
 
-export const DashStatusDot = ({ status, className }: { status: string; className?: string }) =>
+export const DashStatusDot = ({ className }: { status: string; className?: string }) =>
   React.createElement('span', { className });
 
-export const DashSkeleton = ({ height, width, className }: { height: number | string; width?: number | string; className?: string }) =>
+export const DashSkeleton = ({ className }: { height: number | string; width?: number | string; className?: string }) =>
   React.createElement('div', { className });
 
 export const DashDivider = ({ className }: { className?: string }) =>
   React.createElement('hr', { className });
 
-export const DashBadge = ({ children, state, className }: { children: React.ReactNode; state: string; className?: string }) =>
+export const DashBadge = ({ children, className }: { children: React.ReactNode; state: string; className?: string }) =>
   React.createElement('span', { className }, children);
 
 export const DashPill = ({ title }: { title: string }) =>
   React.createElement('span', null, title);
 
-export const DashCarouselDots = ({ count, activeIndex }: { count: number; activeIndex: number }) =>
+export const DashCarouselDots = () =>
   React.createElement('div', null);
 
 export const DashThumbnail = ({ src, alt }: { src?: string; alt?: string }) =>
