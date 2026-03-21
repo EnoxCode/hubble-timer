@@ -67,7 +67,7 @@ describe('paused state', () => {
   it('sets data-state="paused" on root', () => {
     setTimer({ status: 'paused', elapsed: 12_000 });
     const { container } = render(<StopwatchViz />);
-    expect(container.firstChild).toHaveAttribute('data-state', 'paused');
+    expect(container.querySelector('.timer-stopwatch')).toHaveAttribute('data-state', 'paused');
   });
 });
 

@@ -76,14 +76,14 @@ describe('done state', () => {
   it('sets data-state="done" on root', () => {
     setTimer({ status: 'done', duration: 600_000, elapsed: 600_000 });
     const { container } = render(<CountdownViz />);
-    expect(container.firstChild).toHaveAttribute('data-state', 'done');
+    expect(container.querySelector('.timer-countdown')).toHaveAttribute('data-state', 'done');
   });
 
   it('sets data-flash="true" when doneFlash is true', () => {
     setConfig({ doneFlash: true });
     setTimer({ status: 'done', duration: 600_000, elapsed: 600_000 });
     const { container } = render(<CountdownViz />);
-    expect(container.firstChild).toHaveAttribute('data-flash', 'true');
+    expect(container.querySelector('.timer-countdown')).toHaveAttribute('data-flash', 'true');
   });
 
   it('calls requestAcknowledge when doneExpand is true', () => {
@@ -100,7 +100,7 @@ describe('size prop', () => {
   it('sets data-size="l" when size is l', () => {
     setConfig({ size: 'l' });
     const { container } = render(<CountdownViz />);
-    expect(container.firstChild).toHaveAttribute('data-size', 'l');
+    expect(container.querySelector('.timer-countdown')).toHaveAttribute('data-size', 'l');
   });
 
   it('xl size omits dash-glass shell', () => {
@@ -121,7 +121,7 @@ describe('warning threshold', () => {
       elapsed: 0,
     });
     const { container } = render(<CountdownViz />);
-    expect(container.firstChild).toHaveAttribute('data-state', 'warning');
+    expect(container.querySelector('.timer-countdown')).toHaveAttribute('data-state', 'warning');
   });
 
   it('sets data-state="running" when above threshold', () => {
@@ -134,7 +134,7 @@ describe('warning threshold', () => {
       elapsed: 0,
     });
     const { container } = render(<CountdownViz />);
-    expect(container.firstChild).toHaveAttribute('data-state', 'running');
+    expect(container.querySelector('.timer-countdown')).toHaveAttribute('data-state', 'running');
   });
 });
 
