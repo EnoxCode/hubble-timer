@@ -32,6 +32,7 @@ interface CountdownConfig {
   doneExpand: boolean;
   doneFlash: boolean;
   warningThreshold: number;
+  doneAutoReset: number;
 }
 
 const CIRCUMFERENCE = 2 * Math.PI * 40; // r=40, ≈251.3
@@ -69,6 +70,16 @@ export default function CountdownViz() {
       sdk.requestAcknowledge();
     }
   }, [timer?.status, config.doneExpand, sdk]);
+
+  useEffect(() => {
+    if (timer?.status !== 'done') return;
+    const minutes = config.doneAutoReset ?? 0;
+    if (minutes <= 0) return;
+    const id = setTimeout(() => {
+      sdk.callApi('reset', { slug: config.slug });
+    }, minutes * 60 * 1000);
+    return () => clearTimeout(id);
+  }, [timer?.status, config.doneAutoReset, config.slug, sdk]);
 
   // ── Derived display values ─────────────────────────────
   const baseStatus = timer?.status ?? 'idle';

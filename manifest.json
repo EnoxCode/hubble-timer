@@ -282,6 +282,16 @@
           "min": 0,
           "max": 3600,
           "step": 30
+        },
+        {
+          "name": "doneAutoReset",
+          "type": "range",
+          "required": false,
+          "default": 0,
+          "description": "Auto-reset after done (minutes, 0 = never)",
+          "min": 0,
+          "max": 60,
+          "step": 1
         }
       ]
     },
