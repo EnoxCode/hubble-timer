@@ -24,7 +24,7 @@ export function computeTimeRemaining(targetDate: string, now: number): TimeRemai
   if (totalMs <= 0) {
     return { days: 0, hours: 0, minutes: 0, seconds: 0, totalMs: 0, done: true };
   }
-  const totalSec = Math.ceil(totalMs / 1000);
+  const totalSec = Math.floor(totalMs / 1000);
   const days = Math.floor(totalSec / 86400);
   const hours = Math.floor((totalSec % 86400) / 3600);
   const minutes = Math.floor((totalSec % 3600) / 60);
@@ -51,7 +51,7 @@ function HeroContent({ remaining, tier }: { remaining: TimeRemaining; tier: Prec
   if (tier === 'done') {
     return (
       <div className="dc-hero">
-        <div className="dc-hero-num dc-hero-num--today">TODAY</div>
+        <div className="dc-hero-num">TODAY</div>
       </div>
     );
   }
@@ -71,14 +71,14 @@ function HeroContent({ remaining, tier }: { remaining: TimeRemaining; tier: Prec
     parts.push(`${remaining.minutes}m`);
     return (
       <div className="dc-hero">
-        <div className="dc-hero-num dc-hero-num--close">{parts.join(' ')}</div>
+        <div className="dc-hero-num">{parts.join(' ')}</div>
         <div className="dc-hero-unit">remaining</div>
       </div>
     );
   }
   return (
     <div className="dc-hero">
-      <div className="dc-hero-num dc-hero-num--imminent">{remaining.minutes}m {remaining.seconds}s</div>
+      <div className="dc-hero-num">{remaining.minutes}m {remaining.seconds}s</div>
       <div className="dc-hero-unit">remaining</div>
     </div>
   );
@@ -116,6 +116,7 @@ export default function DateCountdownViz() {
     hasFiredDoneRef.current = true;
     if (config.doneNotify) sdk.notify(config.title, { level: 'info' });
     if (config.doneExpand) sdk.requestAcknowledge();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [remaining.done]);
 
   const layout = config.layout ?? 'hero';

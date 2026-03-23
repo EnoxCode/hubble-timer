@@ -8,7 +8,7 @@ import DateCountdownViz from '../../visualizations/date-countdown/index';
 
 const mockConfig = useWidgetConfig as ReturnType<typeof vi.fn>;
 
-const FAR_FUTURE = new Date(Date.now() + 10 * 24 * 60 * 60 * 1000).toISOString(); // 10 days
+const FAR_FUTURE = new Date(Date.now() + 10 * 24 * 60 * 60 * 1000 + 30 * 60 * 1000).toISOString(); // 10 days + 30 min buffer
 
 function setConfig(overrides = {}) {
   mockConfig.mockReturnValue({
@@ -48,7 +48,7 @@ describe('hero layout — days tier (>= 2 days away)', () => {
 
 describe('hero layout — dhm tier (>= 1 hour, < 2 days)', () => {
   it('shows d+h+m format', () => {
-    const target = new Date(Date.now() + 1 * 86400000 + 6 * 3600000 + 23 * 60000).toISOString();
+    const target = new Date(Date.now() + 1 * 86400000 + 6 * 3600000 + 23 * 60000 + 30000).toISOString();
     setConfig({ targetDate: target });
     render(<DateCountdownViz />);
     expect(screen.getByText(/1d.*6h.*23m/)).toBeInTheDocument();
@@ -57,7 +57,7 @@ describe('hero layout — dhm tier (>= 1 hour, < 2 days)', () => {
 
 describe('hero layout — ms tier (< 1 hour)', () => {
   it('shows m+s format', () => {
-    const target = new Date(Date.now() + 23 * 60000 + 11000).toISOString();
+    const target = new Date(Date.now() + 23 * 60000 + 11000 + 500).toISOString();
     setConfig({ targetDate: target });
     render(<DateCountdownViz />);
     expect(screen.getByText(/23m.*11s/)).toBeInTheDocument();
