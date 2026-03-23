@@ -84,6 +84,46 @@ function HeroContent({ remaining, tier }: { remaining: TimeRemaining; tier: Prec
   );
 }
 
+function SegmentedContent({ remaining, tier }: { remaining: TimeRemaining; tier: PrecisionTier | 'done' }) {
+  if (tier === 'done') {
+    return (
+      <div className="dc-segs">
+        <div className="dc-seg">
+          <div className="dc-seg-num">TODAY</div>
+        </div>
+      </div>
+    );
+  }
+
+  type Seg = { num: number; lbl: string };
+  const segments: Seg[] = [];
+
+  if (tier === 'days') {
+    segments.push({ num: remaining.days, lbl: 'days' });
+  } else if (tier === 'dhm') {
+    if (remaining.days > 0) segments.push({ num: remaining.days, lbl: remaining.days === 1 ? 'day' : 'days' });
+    segments.push({ num: remaining.hours, lbl: 'hrs' });
+    segments.push({ num: remaining.minutes, lbl: 'min' });
+  } else {
+    segments.push({ num: remaining.minutes, lbl: 'min' });
+    segments.push({ num: remaining.seconds, lbl: 'sec' });
+  }
+
+  return (
+    <div className="dc-segs">
+      {segments.map((seg, i) => (
+        <React.Fragment key={seg.lbl}>
+          {i > 0 && <div className="dc-seg-sep">:</div>}
+          <div className="dc-seg">
+            <div className="dc-seg-num">{String(seg.num).padStart(2, '0')}</div>
+            <div className="dc-seg-lbl">{seg.lbl}</div>
+          </div>
+        </React.Fragment>
+      ))}
+    </div>
+  );
+}
+
 export default function DateCountdownViz() {
   const config = useWidgetConfig<DateCountdownConfig>();
   const sdk = useHubbleSDK();
@@ -136,7 +176,10 @@ export default function DateCountdownViz() {
       data-size={size}
     >
       {!isXl && <DashWidgetHeader label={config.title} />}
-      <HeroContent remaining={remaining} tier={tier} />
+      {layout === 'segmented'
+        ? <SegmentedContent remaining={remaining} tier={tier} />
+        : <HeroContent remaining={remaining} tier={tier} />
+      }
     </div>
   );
 

@@ -149,3 +149,64 @@ describe('getPrecisionTier', () => {
     expect(getPrecisionTier(0)).toBe('ms');
   });
 });
+
+describe('segmented layout — days tier', () => {
+  it('shows only the days column', () => {
+    setConfig({
+      layout: 'segmented',
+      targetDate: new Date(Date.now() + 10 * 86400000 + 30 * 60000).toISOString(), // +30min buffer
+    });
+    const { container } = render(<DateCountdownViz />);
+    const segs = container.querySelectorAll('.dc-seg');
+    expect(segs).toHaveLength(1);
+    expect(screen.getByText('days')).toBeInTheDocument();
+  });
+});
+
+describe('segmented layout — dhm tier', () => {
+  it('shows days, hrs, min columns when days > 0', () => {
+    setConfig({
+      layout: 'segmented',
+      targetDate: new Date(Date.now() + 1 * 86400000 + 6 * 3600000 + 23 * 60000 + 30000).toISOString(), // +30s buffer
+    });
+    const { container } = render(<DateCountdownViz />);
+    const segs = container.querySelectorAll('.dc-seg');
+    expect(segs).toHaveLength(3);
+    expect(screen.getByText('hrs')).toBeInTheDocument();
+    expect(screen.getByText('min')).toBeInTheDocument();
+  });
+
+  it('omits days column when days is 0', () => {
+    setConfig({
+      layout: 'segmented',
+      targetDate: new Date(Date.now() + 3 * 3600000 + 30 * 60000 + 30000).toISOString(), // +30s buffer
+    });
+    const { container } = render(<DateCountdownViz />);
+    const segs = container.querySelectorAll('.dc-seg');
+    expect(segs).toHaveLength(2); // hrs + min only
+    expect(screen.queryByText('days')).not.toBeInTheDocument();
+  });
+});
+
+describe('segmented layout — ms tier', () => {
+  it('shows min and sec columns', () => {
+    setConfig({
+      layout: 'segmented',
+      targetDate: new Date(Date.now() + 23 * 60000 + 11000 + 500).toISOString(), // +500ms buffer
+    });
+    const { container } = render(<DateCountdownViz />);
+    expect(screen.getByText('min')).toBeInTheDocument();
+    expect(screen.getByText('sec')).toBeInTheDocument();
+  });
+});
+
+describe('segmented layout — done state', () => {
+  it('shows TODAY', () => {
+    setConfig({
+      layout: 'segmented',
+      targetDate: new Date(Date.now() - 1000).toISOString(),
+    });
+    render(<DateCountdownViz />);
+    expect(screen.getByText('TODAY')).toBeInTheDocument();
+  });
+});
