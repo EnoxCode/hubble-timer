@@ -116,6 +116,9 @@ export default function DateCountdownViz() {
     hasFiredDoneRef.current = true;
     if (config.doneNotify) sdk.notify(config.title, { level: 'info' });
     if (config.doneExpand) sdk.requestAcknowledge();
+    // config/sdk intentionally omitted: this effect must fire exactly once when
+    // the countdown first reaches zero. hasFiredDoneRef prevents re-firing on
+    // re-renders. Capturing config values at fire-time is correct behavior.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [remaining.done]);
 
