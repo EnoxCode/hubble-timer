@@ -212,6 +212,8 @@ describe('segmented layout — done state', () => {
 });
 
 describe('done effects — past target on mount', () => {
+  afterEach(() => { (useHubbleSDK as ReturnType<typeof vi.fn>).mockReset(); });
+
   it('does not call sdk.notify when mounted with a past target date', () => {
     const mockSdk = { requestAcknowledge: vi.fn(), notify: vi.fn() };
     (useHubbleSDK as ReturnType<typeof vi.fn>).mockReturnValue(mockSdk);
@@ -227,7 +229,10 @@ describe('done effects — past target on mount', () => {
 });
 
 describe('done effects — countdown reaches zero during session', () => {
-  afterEach(() => vi.useRealTimers());
+  afterEach(() => {
+    vi.useRealTimers();
+    (useHubbleSDK as ReturnType<typeof vi.fn>).mockReset();
+  });
 
   it('calls sdk.notify when countdown reaches zero and doneNotify is true', () => {
     vi.useFakeTimers();
