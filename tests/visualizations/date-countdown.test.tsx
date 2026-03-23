@@ -1,8 +1,8 @@
 import { describe, it, expect } from 'vitest';
 import { computeTimeRemaining, getPrecisionTier } from '../../visualizations/date-countdown/index';
 import React from 'react';
-import { vi, beforeEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { vi, beforeEach, afterEach } from 'vitest';
+import { render, screen, act } from '@testing-library/react';
 import { useWidgetConfig, useHubbleSDK } from '@hubble/sdk';
 import DateCountdownViz from '../../visualizations/date-countdown/index';
 
@@ -208,5 +208,74 @@ describe('segmented layout — done state', () => {
     });
     render(<DateCountdownViz />);
     expect(screen.getByText('TODAY')).toBeInTheDocument();
+  });
+});
+
+describe('done effects — past target on mount', () => {
+  it('does not call sdk.notify when mounted with a past target date', () => {
+    const mockSdk = { requestAcknowledge: vi.fn(), notify: vi.fn() };
+    (useHubbleSDK as ReturnType<typeof vi.fn>).mockReturnValue(mockSdk);
+    setConfig({
+      targetDate: new Date(Date.now() - 5000).toISOString(),
+      doneNotify: true,
+      doneExpand: true,
+    });
+    render(<DateCountdownViz />);
+    expect(mockSdk.notify).not.toHaveBeenCalled();
+    expect(mockSdk.requestAcknowledge).not.toHaveBeenCalled();
+  });
+});
+
+describe('done effects — countdown reaches zero during session', () => {
+  afterEach(() => vi.useRealTimers());
+
+  it('calls sdk.notify when countdown reaches zero and doneNotify is true', () => {
+    vi.useFakeTimers();
+    const mockSdk = { requestAcknowledge: vi.fn(), notify: vi.fn() };
+    (useHubbleSDK as ReturnType<typeof vi.fn>).mockReturnValue(mockSdk);
+
+    const target = new Date(Date.now() + 500).toISOString();
+    setConfig({ targetDate: target, doneNotify: true, doneExpand: false });
+
+    const { rerender } = render(<DateCountdownViz />);
+    expect(mockSdk.notify).not.toHaveBeenCalled();
+
+    act(() => { vi.advanceTimersByTime(2000); });
+    rerender(<DateCountdownViz />);
+
+    expect(mockSdk.notify).toHaveBeenCalledWith('Summer Vacation', { level: 'info' });
+    expect(mockSdk.requestAcknowledge).not.toHaveBeenCalled();
+  });
+
+  it('calls sdk.requestAcknowledge when doneExpand is true', () => {
+    vi.useFakeTimers();
+    const mockSdk = { requestAcknowledge: vi.fn(), notify: vi.fn() };
+    (useHubbleSDK as ReturnType<typeof vi.fn>).mockReturnValue(mockSdk);
+
+    const target = new Date(Date.now() + 500).toISOString();
+    setConfig({ targetDate: target, doneNotify: false, doneExpand: true });
+
+    const { rerender } = render(<DateCountdownViz />);
+    act(() => { vi.advanceTimersByTime(2000); });
+    rerender(<DateCountdownViz />);
+
+    expect(mockSdk.requestAcknowledge).toHaveBeenCalled();
+  });
+
+  it('does not call sdk.notify more than once', () => {
+    vi.useFakeTimers();
+    const mockSdk = { requestAcknowledge: vi.fn(), notify: vi.fn() };
+    (useHubbleSDK as ReturnType<typeof vi.fn>).mockReturnValue(mockSdk);
+
+    const target = new Date(Date.now() + 500).toISOString();
+    setConfig({ targetDate: target, doneNotify: true });
+
+    const { rerender } = render(<DateCountdownViz />);
+    act(() => { vi.advanceTimersByTime(2000); });
+    rerender(<DateCountdownViz />);
+    act(() => { vi.advanceTimersByTime(2000); });
+    rerender(<DateCountdownViz />);
+
+    expect(mockSdk.notify).toHaveBeenCalledTimes(1);
   });
 });
