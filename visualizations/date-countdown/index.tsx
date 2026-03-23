@@ -150,7 +150,7 @@ export default function DateCountdownViz() {
       setRemaining(computeTimeRemaining(config.targetDate, Date.now()));
     }, intervalMs);
     return () => clearInterval(id);
-  }, [tier, config.targetDate, remaining.done]);
+  }, [tier, intervalMs, config.targetDate, remaining.done]);
 
   useEffect(() => {
     if (!remaining.done) return;

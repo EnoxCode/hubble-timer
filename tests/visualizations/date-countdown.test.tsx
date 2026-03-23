@@ -194,7 +194,7 @@ describe('segmented layout — ms tier', () => {
       layout: 'segmented',
       targetDate: new Date(Date.now() + 23 * 60000 + 11000 + 500).toISOString(), // +500ms buffer
     });
-    const { container } = render(<DateCountdownViz />);
+    render(<DateCountdownViz />);
     expect(screen.getByText('min')).toBeInTheDocument();
     expect(screen.getByText('sec')).toBeInTheDocument();
   });
