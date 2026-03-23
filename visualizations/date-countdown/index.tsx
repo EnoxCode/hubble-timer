@@ -99,7 +99,7 @@ function SegmentedContent({ remaining, tier }: { remaining: TimeRemaining; tier:
   const segments: Seg[] = [];
 
   if (tier === 'days') {
-    segments.push({ num: remaining.days, lbl: 'days', pad: false });
+    segments.push({ num: remaining.days, lbl: remaining.days === 1 ? 'day' : 'days', pad: false });
   } else if (tier === 'dhm') {
     if (remaining.days > 0) segments.push({ num: remaining.days, lbl: remaining.days === 1 ? 'day' : 'days', pad: false });
     segments.push({ num: remaining.hours, lbl: 'hrs' });
@@ -143,6 +143,9 @@ export default function DateCountdownViz() {
 
   useEffect(() => {
     if (remaining.done) return;
+    // Fire immediately so the display is up-to-date on mount and on tier changes,
+    // then keep ticking on the interval.
+    setRemaining(computeTimeRemaining(config.targetDate, Date.now()));
     const id = setInterval(() => {
       setRemaining(computeTimeRemaining(config.targetDate, Date.now()));
     }, intervalMs);
