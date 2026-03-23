@@ -62,7 +62,7 @@ Glassmorphism widget shell (`backdrop-filter: blur`, semi-transparent dark backg
 Large primary number dominates (days when far, adaptive units as it closes in). Secondary line shows additional precision and the target date as subtext.
 
 ### Layout: Segmented
-Each unit in its own labeled column with colon separators. Clock-like. All units equally weighted.
+Each unit in its own labeled column with colon separators. Clock-like. Only the units relevant to the current precision tier are shown — unused columns are hidden, not shown as zeroes. For example, at ≥ 2 days only the days column is shown; at < 2 days the days + hours + minutes columns appear.
 
 ### States
 - **Far away:** white number, muted label
@@ -130,3 +130,5 @@ SDK mocked per the pattern in CLAUDE.md (`useWidgetConfig`, `useHubbleSDK`).
 - Warning threshold config (not relevant for calendar events)
 - Hardware button support (no interactive controls needed)
 - Connector / server-side involvement
+- `doneFlash` property (intentionally excluded — not adding parity with kitchen timers)
+- `doneSelect` property (intentionally excluded — same reason)
