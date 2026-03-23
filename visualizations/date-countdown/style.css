@@ -1,0 +1,109 @@
+/* ── Shell ── */
+.date-countdown {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ── Hero layout ── */
+.dc-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.dc-hero-num {
+  font-weight: 800;
+  line-height: 1;
+  color: var(--dash-text-primary, rgba(255, 255, 255, 0.85));
+}
+
+.dc-hero-unit {
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--dash-text-muted, rgba(255, 255, 255, 0.25));
+}
+
+.dc-hero-sub {
+  font-size: 11px;
+  color: var(--dash-text-muted, rgba(255, 255, 255, 0.25));
+}
+
+/* imminent — amber */
+.date-countdown[data-state="imminent"] .dc-hero-num {
+  color: var(--dash-state-warning, #fbbf24);
+}
+.date-countdown[data-state="imminent"] .dc-hero-unit {
+  color: rgba(251, 191, 36, 0.45);
+}
+
+/* done — green */
+.date-countdown[data-state="done"] .dc-hero-num {
+  color: var(--dash-state-positive, #4ade80);
+  letter-spacing: 3px;
+}
+
+/* ── Segmented layout ── */
+.dc-segs {
+  display: flex;
+  gap: 4px;
+  align-items: flex-end;
+}
+
+.dc-seg {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.dc-seg-num {
+  font-weight: 800;
+  font-family: monospace;
+  line-height: 1;
+  color: var(--dash-text-primary, rgba(255, 255, 255, 0.85));
+}
+
+.dc-seg-lbl {
+  font-size: 8px;
+  font-weight: 500;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--dash-text-muted, rgba(255, 255, 255, 0.25));
+  margin-top: 2px;
+}
+
+.dc-seg-sep {
+  font-family: monospace;
+  color: rgba(255, 255, 255, 0.15);
+  padding-bottom: 12px;
+}
+
+.date-countdown[data-state="imminent"] .dc-seg-num {
+  color: var(--dash-state-warning, #fbbf24);
+}
+
+.date-countdown[data-state="done"] .dc-seg-num {
+  color: var(--dash-state-positive, #4ade80);
+  letter-spacing: 2px;
+}
+
+/* ── Size variants ── */
+.date-countdown[data-size="s"] .dc-hero-num  { font-size: 36px; }
+.date-countdown[data-size="s"] .dc-seg-num   { font-size: 22px; }
+.date-countdown[data-size="s"] .dc-seg-sep   { font-size: 18px; padding-bottom: 8px; }
+
+.date-countdown[data-size="m"] .dc-hero-num  { font-size: 52px; }
+.date-countdown[data-size="m"] .dc-seg-num   { font-size: 30px; }
+.date-countdown[data-size="m"] .dc-seg-sep   { font-size: 22px; padding-bottom: 10px; }
+
+.date-countdown[data-size="l"] .dc-hero-num  { font-size: 72px; letter-spacing: -2px; }
+.date-countdown[data-size="l"] .dc-seg-num   { font-size: 42px; }
+.date-countdown[data-size="l"] .dc-seg-sep   { font-size: 30px; padding-bottom: 14px; }
+
+.date-countdown[data-size="xl"] .dc-hero-num  { font-size: 96px; letter-spacing: -4px; }
+.date-countdown[data-size="xl"] .dc-seg-num   { font-size: 56px; }
+.date-countdown[data-size="xl"] .dc-seg-sep   { font-size: 40px; padding-bottom: 18px; }

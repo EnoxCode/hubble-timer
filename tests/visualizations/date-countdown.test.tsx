@@ -1,5 +1,89 @@
 import { describe, it, expect } from 'vitest';
 import { computeTimeRemaining, getPrecisionTier } from '../../visualizations/date-countdown/index';
+import React from 'react';
+import { vi, beforeEach } from 'vitest';
+import { render, screen } from '@testing-library/react';
+import { useWidgetConfig, useHubbleSDK } from '@hubble/sdk';
+import DateCountdownViz from '../../visualizations/date-countdown/index';
+
+const mockConfig = useWidgetConfig as ReturnType<typeof vi.fn>;
+
+const FAR_FUTURE = new Date(Date.now() + 10 * 24 * 60 * 60 * 1000).toISOString(); // 10 days
+
+function setConfig(overrides = {}) {
+  mockConfig.mockReturnValue({
+    title: 'Summer Vacation',
+    targetDate: FAR_FUTURE,
+    layout: 'hero',
+    size: 'm',
+    doneNotify: true,
+    doneExpand: false,
+    ...overrides,
+  });
+}
+
+beforeEach(() => setConfig());
+
+describe('hero layout — days tier (>= 2 days away)', () => {
+  it('shows the day count', () => {
+    render(<DateCountdownViz />);
+    expect(screen.getByText('10')).toBeInTheDocument();
+  });
+
+  it('shows "days remaining" label', () => {
+    render(<DateCountdownViz />);
+    expect(screen.getByText('days remaining')).toBeInTheDocument();
+  });
+
+  it('shows the widget title', () => {
+    render(<DateCountdownViz />);
+    expect(screen.getByText('Summer Vacation')).toBeInTheDocument();
+  });
+
+  it('sets data-state="active"', () => {
+    const { container } = render(<DateCountdownViz />);
+    expect(container.querySelector('.date-countdown')).toHaveAttribute('data-state', 'active');
+  });
+});
+
+describe('hero layout — dhm tier (>= 1 hour, < 2 days)', () => {
+  it('shows d+h+m format', () => {
+    const target = new Date(Date.now() + 1 * 86400000 + 6 * 3600000 + 23 * 60000).toISOString();
+    setConfig({ targetDate: target });
+    render(<DateCountdownViz />);
+    expect(screen.getByText(/1d.*6h.*23m/)).toBeInTheDocument();
+  });
+});
+
+describe('hero layout — ms tier (< 1 hour)', () => {
+  it('shows m+s format', () => {
+    const target = new Date(Date.now() + 23 * 60000 + 11000).toISOString();
+    setConfig({ targetDate: target });
+    render(<DateCountdownViz />);
+    expect(screen.getByText(/23m.*11s/)).toBeInTheDocument();
+  });
+
+  it('sets data-state="imminent"', () => {
+    const target = new Date(Date.now() + 23 * 60000).toISOString();
+    setConfig({ targetDate: target });
+    const { container } = render(<DateCountdownViz />);
+    expect(container.querySelector('.date-countdown')).toHaveAttribute('data-state', 'imminent');
+  });
+});
+
+describe('done state (target in the past)', () => {
+  it('shows TODAY', () => {
+    setConfig({ targetDate: new Date(Date.now() - 1000).toISOString() });
+    render(<DateCountdownViz />);
+    expect(screen.getByText('TODAY')).toBeInTheDocument();
+  });
+
+  it('sets data-state="done"', () => {
+    setConfig({ targetDate: new Date(Date.now() - 1000).toISOString() });
+    const { container } = render(<DateCountdownViz />);
+    expect(container.querySelector('.date-countdown')).toHaveAttribute('data-state', 'done');
+  });
+});
 
 const MS = {
   sec: 1000,
