@@ -379,6 +379,82 @@
           "description": "Show .xx subsecond suffix in smaller text"
         }
       ]
+    },
+    {
+      "name": "Date Countdown",
+      "description": "Counts down to a configured date/time with adaptive precision",
+      "path": "date-countdown",
+      "selectable": true,
+      "properties": [
+        {
+          "name": "title",
+          "type": "string",
+          "required": true,
+          "description": "Event name displayed on the widget"
+        },
+        {
+          "name": "targetDate",
+          "type": "datetime",
+          "required": true,
+          "description": "The date/time to count down to"
+        },
+        {
+          "name": "layout",
+          "type": "choice",
+          "required": false,
+          "default": "hero",
+          "description": "Display layout",
+          "choices": [
+            {
+              "label": "Hero Number",
+              "value": "hero"
+            },
+            {
+              "label": "Segmented",
+              "value": "segmented"
+            }
+          ]
+        },
+        {
+          "name": "size",
+          "type": "choice",
+          "required": false,
+          "default": "m",
+          "description": "Widget size",
+          "choices": [
+            {
+              "label": "Small",
+              "value": "s"
+            },
+            {
+              "label": "Medium",
+              "value": "m"
+            },
+            {
+              "label": "Large",
+              "value": "l"
+            },
+            {
+              "label": "Extra Large",
+              "value": "xl"
+            }
+          ]
+        },
+        {
+          "name": "doneNotify",
+          "type": "boolean",
+          "required": false,
+          "default": true,
+          "description": "Send a notification when the date arrives"
+        },
+        {
+          "name": "doneExpand",
+          "type": "boolean",
+          "required": false,
+          "default": false,
+          "description": "Expand full-screen (requires hardware button to dismiss) when the date arrives"
+        }
+      ]
     }
   ]
 }
