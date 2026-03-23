@@ -95,13 +95,13 @@ function SegmentedContent({ remaining, tier }: { remaining: TimeRemaining; tier:
     );
   }
 
-  type Seg = { num: number; lbl: string };
+  type Seg = { num: number; lbl: string; pad?: boolean };
   const segments: Seg[] = [];
 
   if (tier === 'days') {
-    segments.push({ num: remaining.days, lbl: 'days' });
+    segments.push({ num: remaining.days, lbl: 'days', pad: false });
   } else if (tier === 'dhm') {
-    if (remaining.days > 0) segments.push({ num: remaining.days, lbl: remaining.days === 1 ? 'day' : 'days' });
+    if (remaining.days > 0) segments.push({ num: remaining.days, lbl: remaining.days === 1 ? 'day' : 'days', pad: false });
     segments.push({ num: remaining.hours, lbl: 'hrs' });
     segments.push({ num: remaining.minutes, lbl: 'min' });
   } else {
@@ -115,7 +115,7 @@ function SegmentedContent({ remaining, tier }: { remaining: TimeRemaining; tier:
         <React.Fragment key={seg.lbl}>
           {i > 0 && <div className="dc-seg-sep">:</div>}
           <div className="dc-seg">
-            <div className="dc-seg-num">{String(seg.num).padStart(2, '0')}</div>
+            <div className="dc-seg-num">{seg.pad === false ? seg.num : String(seg.num).padStart(2, '0')}</div>
             <div className="dc-seg-lbl">{seg.lbl}</div>
           </div>
         </React.Fragment>
